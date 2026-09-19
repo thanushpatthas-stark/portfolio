@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanush Puvanesvaran — Industrial & Product Design Portfolio</title>
+  <meta name="description" content="Industrial and product design portfolio of Thanush Puvanesvaran (UniSZA). Exploring physical objects, CAD engineering, CMF, ergonomic systems, and craft storytelling.">
+  <meta name="keywords" content="Industrial Design, Product Design, Portfolio, Fusion 360, Prototyping, CMF, Dominik Scherrer style, UniSZA, Thanush Puvanesvaran">
+
+  <!-- Typography: Space Grotesk (Editorial Display), Plus Jakarta Sans (Body), JetBrains Mono (Technical Spec) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <!-- Three.js 3D Engine for Interactive CAD Viewport -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Dedicated External Stylesheet (Easily editable later) -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       CLASSICAL AMBIENT STUDIO LIGHTING, GENERATIVE STREAMLINES & INTERACTIVE GRID
+       ========================================================================= -->
+  <div class="ambient-studio-canvas" id="ambient-canvas-wrapper" aria-hidden="true">
+    <!-- Interactive Cursor Studio Spotlight -->
+    <div class="ambient-cursor-spotlight" id="cursor-spotlight"></div>
+
+    <!-- Generative CAD Aerodynamic Streamlines Canvas -->
+    <canvas class="ambient-wave-canvas" id="ambient-wave-canvas"></canvas>
+
+    <!-- Ambient Atmospheric Orbs -->
+    <div class="ambient-orb orb-warm"></div>
+    <div class="ambient-orb orb-cool"></div>
+    <div class="ambient-orb orb-lumina"></div>
+
+    <!-- Architectural Drafting Crosshairs -->
+    <div class="drafting-crosshair crosshair-tl"><span>+</span> <small>GRID 36MM</small></div>
+    <div class="drafting-crosshair crosshair-tr"><span>+</span> <small>CAD REF</small></div>
+    <div class="drafting-crosshair crosshair-bl"><span>+</span> <small>TOL ±0.05</small></div>
+    <div class="drafting-crosshair crosshair-br"><span>+</span> <small>STUDIO 2026</small></div>
+
+    <!-- Architectural Millimeter Dot Matrix Pattern -->
+    <div class="ambient-architectural-grid"></div>
+  </div>
+
+  <!-- =========================================================================
+       01. ARCHITECTURAL FLOATING CONSOLE NAVIGATION (WITH INDUSTRIAL DESIGN LOGO)
+       ========================================================================= -->
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
+      
+      <!-- Brand & Industrial Design Geometric Logo -->
+      <a href="#top" class="brand-wrapper" aria-label="Thanush Puvanesvaran — Industrial & Product Design Home">
+        <div class="brand-id-logo" title="Thanush Puvanesvaran · Industrial Design CAD Emblem">
+          <svg class="id-symbol-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Caliper & Compass Dimension Ring -->
+            <circle cx="20" cy="20" r="18" stroke="var(--border-subtle)" stroke-width="1.2" stroke-dasharray="3 3"/>
+            <!-- Isometric CAD Cube Top Face -->
+            <path d="M20 5L33 12.5L20 20L7 12.5L20 5Z" fill="url(#idGradTop)" stroke="var(--border-strong)" stroke-width="1.3" stroke-linejoin="round"/>
+            <!-- Isometric CAD Cube Left Face -->
+            <path d="M7 12.5L20 20V34L7 26.5V12.5Z" fill="url(#idGradLeft)" stroke="var(--border-strong)" stroke-width="1.3" stroke-linejoin="round"/>
+            <!-- Isometric CAD Cube Right Face -->
+            <path d="M20 20L33 12.5V26.5L20 34V20Z" fill="url(#idGradRight)" stroke="var(--border-strong)" stroke-width="1.3" stroke-linejoin="round"/>
+            <!-- 3-Axis Precision Origin Point & Vectors -->
+            <circle cx="20" cy="20" r="2.4" fill="var(--accent-blue)"/>
+            <line x1="20" y1="20" x2="20" y2="9" stroke="var(--accent-blue)" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="20" y1="20" x2="11" y2="25" stroke="var(--accent-blue)" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="20" y1="20" x2="29" y2="25" stroke="var(--accent-blue)" stroke-width="1.4" stroke-linecap="round"/>
+            <!-- Linear Gradients for 3D Faces -->
+            <defs>
+              <linearGradient id="idGradTop" x1="7" y1="5" x2="33" y2="20" gradientUnits="userSpaceOnUse">
+                <stop stop-color="var(--bg-surface)"/>
+                <stop offset="1" stop-color="var(--bg-secondary)"/>
+              </linearGradient>
+              <linearGradient id="idGradLeft" x1="7" y1="12.5" x2="20" y2="34" gradientUnits="userSpaceOnUse">
+                <stop stop-color="var(--bg-secondary)"/>
+                <stop offset="1" stop-color="var(--border-subtle)"/>
+              </linearGradient>
+              <linearGradient id="idGradRight" x1="20" y1="12.5" x2="33" y2="34" gradientUnits="userSpaceOnUse">
+                <stop stop-color="var(--bg-surface)"/>
+                <stop offset="1" stop-color="var(--bg-secondary)"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <div class="brand-text-block">
+          <div class="brand-name-row">
+            <span class="brand-name">Thanush Puvanesvaran</span>
+            <span class="brand-id-chip">ID</span>
+          </div>
+          <div class="brand-subtext">Industrial &amp; Product Design · UniSZA</div>
+        </div>
+      </a>
+
+      <!-- Architectural Segmented Navigation Dock -->
+      <nav class="nav-dock-menu" aria-label="Primary Navigation">
+        <a href="#work" class="nav-dock-link">
+          <span class="dock-num">01</span>
+          <span class="dock-label">Works</span>
+        </a>
+        <a href="#cad-studio" class="nav-dock-link">
+          <span class="dock-num">02</span>
+          <span class="dock-label">3D CAD Studio</span>
+        </a>
+        <a href="#process" class="nav-dock-link">
+          <span class="dock-num">03</span>
+          <span class="dock-label">Process</span>
+        </a>
+        <a href="#capabilities" class="nav-dock-link">
+          <span class="dock-num">04</span>
+          <span class="dock-label">Toolkit</span>
+        </a>
+        <a href="#timeline" class="nav-dock-link">
+          <span class="dock-num">05</span>
+          <span class="dock-label">Timeline</span>
+        </a>
+        <a href="#about" class="nav-dock-link">
+          <span class="dock-num">06</span>
+          <span class="dock-label">Profile</span>
+        </a>
+      </nav>
+
+      <!-- Cockpit Actions Cluster -->
+      <div class="header-dock-actions">
+        <!-- Live Clock -->
+        <span class="time-badge" id="live-clock">17:35 MYT (UTC+8)</span>
+
+        <!-- Precision Rocker Theme Switch -->
+        <div class="theme-rocker-switch" role="radiogroup" aria-label="Theme Selection">
+          <button type="button" class="theme-mode-btn active" id="theme-btn-light" data-set-theme="light" aria-label="White Theme">
+            <span class="theme-icon" aria-hidden="true">☼</span>
+            <span class="theme-label">WHITE</span>
+          </button>
+          <button type="button" class="theme-mode-btn" id="theme-btn-dark" data-set-theme="dark" aria-label="Dark Theme">
+            <span class="theme-icon" aria-hidden="true">☾</span>
+            <span class="theme-label">DARK</span>
+          </button>
+        </div>
+
+        <!-- Direct Contact Action -->
+        <a href="#contact" class="dock-cta-btn">
+          <span>Contact</span>
+          <span class="cta-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <!-- Mobile Hamburger Menu Button -->
+        <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Navigation Menu" aria-expanded="false">
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer Overlay -->
+  <div class="mobile-nav-drawer" id="mobile-nav-drawer" aria-hidden="true">
+    <div class="mobile-nav-inner">
+      <div class="mobile-nav-header">
+        <div class="mobile-brand-title">Thanush Puvanesvaran</div>
+        <div class="mobile-brand-sub">Bachelor of Industrial Design (Hons) · UniSZA</div>
+      </div>
+      <div class="mobile-nav-links">
+        <a href="#work" class="mobile-nav-link"><span class="m-num">01.</span> Selected Works</a>
+        <a href="#cad-studio" class="mobile-nav-link"><span class="m-num">02.</span> 3D CAD Modeling Studio</a>
+        <a href="#process" class="mobile-nav-link"><span class="m-num">03.</span> Design Methodology</a>
+        <a href="#capabilities" class="mobile-nav-link"><span class="m-num">04.</span> Technical Toolkit</a>
+        <a href="#timeline" class="mobile-nav-link"><span class="m-num">05.</span> Academic Timeline &amp; Competitions</a>
+        <a href="#about" class="mobile-nav-link"><span class="m-num">06.</span> Profile &amp; Dual Portraits</a>
+        <a href="#contact" class="mobile-nav-link"><span class="m-num">07.</span> Contact &amp; Inquiries</a>
+      </div>
+      <div class="mobile-nav-footer">
+        <span class="status-dot"></span> Available for 2025/2026 Internship Opportunities
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MAIN CONTENT
+       ========================================================================= -->
+  <main id="top">
+
+    <!-- =======================================================================
+         01. TOP INTRODUCTION (ROW 1: DEDICATED SOLELY TO THANUSH WITH BIG IMAGES)
+         ======================================================================= -->
+    <section class="intro-hero-section" id="intro" aria-labelledby="intro-name">
+      <div class="container">
+        
+        <!-- Clean Editorial Topline -->
+        <div class="intro-topline">
+          <span class="intro-institution">Universiti Sultan Zainal Abidin (UniSZA) · Terengganu, Malaysia</span>
+          <span class="intro-status"><span class="status-dot"></span> Available for 2025/2026 Opportunities</span>
+        </div>
+
+        <!-- First Row: Dedicated Introduction Layout -->
+        <div class="intro-first-row-grid">
+
+          <!-- Left: Big, Prominent, High-Resolution Designer Image -->
+          <div class="intro-image-column reveal-on-scroll">
+            <div class="designer-portrait-card">
+              <div class="designer-portrait-frame">
+                <img id="hero-portrait-img" src="Img/thanush_proffesional.png" alt="Thanush Puvanesvaran — Industrial Designer" class="designer-portrait-img">
+                <div class="portrait-caption-tag" id="portrait-photo-badge">Studio Work Portrait</div>
+              </div>
+
+              <!-- High-End Portrait Switcher -->
+              <div class="portrait-toggle-bar">
+                <button type="button" class="portrait-toggle-btn active" id="btn-photo-studio" data-photo-src="Img/thanush_proffesional.png" data-badge="Studio Work Portrait" aria-label="Show Studio Portrait">
+                  Studio Portrait
+                </button>
+                <button type="button" class="portrait-toggle-btn" id="btn-photo-formal" data-photo-src="Img/formal_me.jpg" data-badge="Formal Profile Portrait" aria-label="Show Formal Portrait">
+                  Formal Portrait
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Comprehensive Professional Introduction -->
+          <div class="intro-text-column reveal-on-scroll">
+            
+            <div class="intro-kicker">Industrial &amp; Product Designer</div>
+
+            <h1 class="intro-title" id="intro-name">
+              Thanush Puvanesvaran
+            </h1>
+
+            <p class="intro-lead-statement">
+              Designing physical objects with tactile intent, ergonomic clarity, and 3D parametric rigor.
+            </p>
+
+            <p class="intro-paragraph">
+              I am an industrial design student at the Faculty of Innovative Design &amp; Technology, Universiti Sultan Zainal Abidin (UniSZA) in Terengganu, Malaysia. My design practice bridges hands-on workshop fabrication, parametric 3D CAD engineering, and purposeful material CMF to create objects that feel natural to hold, intuitive to understand, and built to last.
+            </p>
+
+            <!-- Human Credentials Matrix -->
+            <div class="intro-credentials-grid">
+              <div class="credential-item">
+                <span class="cred-label">Degree &amp; Institution</span>
+                <span class="cred-value">B. Industrial Design (Hons)</span>
+                <span class="cred-sub">UniSZA Faculty of Innovative Design &amp; Technology</span>
+              </div>
+
+              <div class="credential-item">
+                <span class="cred-label">Core Digital Tools</span>
+                <span class="cred-value">Autodesk Fusion 360 &amp; KeyShot</span>
+                <span class="cred-sub">Parametric Assemblies, Surface Modeling, CMF</span>
+              </div>
+
+              <div class="credential-item">
+                <span class="cred-label">Physical Prototyping</span>
+                <span class="cred-value">FDM 3D Printing &amp; Bench Craft</span>
+                <span class="cred-sub">Foam Sculpting, Wood Shaping, Assembly</span>
+              </div>
+
+              <div class="credential-item">
+                <span class="cred-label">Design Specialization</span>
+                <span class="cred-value">Hardware &amp; Consumer Objects</span>
+                <span class="cred-sub">Acoustics, Modular Systems, Appliances</span>
+              </div>
+            </div>
+
+            <!-- Clear Action Buttons -->
+            <div class="intro-actions-group">
+              <a href="#work" class="btn-action-primary">View Selected Works ↓</a>
+              <a href="#cad-studio" class="btn-action-secondary">Inspect 3D CAD Model ↓</a>
+              <button type="button" class="btn-action-ghost" data-copy-email="thanushpatthas@gmail.com">Copy Email</button>
+              <a href="#contact" class="btn-action-ghost">Contact ↗</a>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         02. DEDICATED 3D CAD MODELING STUDIO SECTION
+         Spacious, professional showcase of Agomoto Acoustic Assembly
+         ======================================================================= -->
+    <section class="section-wrapper cad-studio-section" id="cad-studio" aria-labelledby="cad-section-title">
+      <div class="container">
+        
+        <!-- Section Header -->
+        <div class="section-head reveal-on-scroll">
+          <div>
+            <div class="section-index-badge">02. 3D CAD Modeling Studio</div>
+            <h2 class="section-title" id="cad-section-title">Agomoto Acoustic Speaker</h2>
+          </div>
+          <p class="section-description">
+            An interactive 3D parametric CAD study developed in Fusion 360. Rotate freely in 3D, inspect geometry in wireframe, and drag the exploded view slider to examine the internal acoustic architecture.
+          </p>
+        </div>
+
+        <!-- Full-Width 3D CAD Viewport Studio -->
+        <div class="cad-studio-card reveal-on-scroll">
+          
+          <!-- Viewport Header -->
+          <div class="cad-viewport-header">
+            <div class="cad-title-wrap">
+              <span class="cad-status-blink">● 3D CAD Viewport</span>
+              <span class="cad-project-name">Agomoto Acoustic Assembly</span>
+            </div>
+            <div class="cad-coordinate-readout" id="cad-coords">Live 3D Viewport · Orbit Active</div>
+          </div>
+
+          <!-- 3D Interactive Canvas -->
+          <div class="cad-canvas-wrapper" id="cad-canvas-container" title="Click and drag to rotate in 3D. Scroll to zoom.">
+            <!-- Three.js mounts canvas here -->
+            <div class="cad-drag-hint">
+              <span class="hint-icon">↺</span> Drag to orbit 3D model · Scroll to zoom
+            </div>
+
+            <div class="cad-dimension-badge">
+              <span>Ø 140 mm</span>
+              <span>H 220 mm</span>
+            </div>
+          </div>
+
+          <!-- Clean CAD Controls Toolbar -->
+          <div class="cad-viewport-toolbar">
+            <div class="cad-control-group">
+              <span class="cad-ctrl-label">Shading:</span>
+              <div class="cad-btn-group">
+                <button type="button" class="cad-mode-btn active" id="cad-mode-cmf" data-cad-mode="cmf">Shaded CMF</button>
+                <button type="button" class="cad-mode-btn" id="cad-mode-wire" data-cad-mode="wire">Wireframe</button>
+                <button type="button" class="cad-mode-btn" id="cad-mode-clay" data-cad-mode="clay">Clay Studio</button>
+              </div>
+            </div>
+
+            <div class="cad-control-group cad-slider-group">
+              <span class="cad-ctrl-label">Exploded View:</span>
+              <input type="range" id="cad-explode-slider" min="0" max="100" value="0" class="cad-range-slider" aria-label="Exploded assembly slider">
+              <span id="explode-val-display" class="cad-slider-val">0%</span>
+            </div>
+
+            <div class="cad-control-group cad-actions-group">
+              <button type="button" class="cad-action-btn active" id="cad-btn-autorotate" title="Toggle Turntable Rotation">
+                <span id="autorotate-indicator">●</span> Turntable
+              </button>
+              <button type="button" class="cad-action-btn" id="cad-btn-reset" title="Reset Camera View">
+                Reset View
+              </button>
+            </div>
+          </div>
+
+          <!-- Technical Specs Footer -->
+          <div class="cad-viewport-footer">
+            <span>Fusion 360 Parametric CAD · 6 Multi-Body Components</span>
+            <span>CMF: Anodized Gold Bronze &amp; Machined Alloy</span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         03. SELECTED WORKS & DEEP DIVES (DOMINIK SCHERRER METHOD)
+         ======================================================================= -->
+    <section class="section-wrapper" id="work" aria-labelledby="work-title">
+      <div class="container">
+
+        <!-- Section Header -->
+        <div class="section-head reveal-on-scroll">
+          <div>
+            <div class="section-index-badge">03. Selected Works</div>
+            <h2 class="section-title" id="work-title">Engineered by Hand. Refined in CAD.</h2>
+          </div>
+          <p class="section-description">
+            A curated portfolio of industrial objects bridging maritime craft, acoustic hardware, modular nutritional packaging, and ceremonial personal appliances. Click any project to open the technical case study.
+          </p>
+        </div>
+
+        <!-- Interactive Category Filter Bar -->
+        <div class="filter-bar reveal-on-scroll" role="tablist" aria-label="Project Category Filter">
+          <button type="button" class="filter-btn active" data-filter="all">All Projects (4)</button>
+          <button type="button" class="filter-btn" data-filter="marine-craft">Maritime &amp; Craft</button>
+          <button type="button" class="filter-btn" data-filter="audio-hardware">Audio Hardware</button>
+          <button type="button" class="filter-btn" data-filter="modular-bento">Modular Bento</button>
+          <button type="button" class="filter-btn" data-filter="appliance">Personal Appliance</button>
+        </div>
+
+        <!-- Projects Grid (Asymmetric Swiss Rhythm) -->
+        <div class="projects-grid">
+
+          <!-- PROJECT 01: BOAT REDANG -->
+          <article class="project-item reveal-on-scroll" data-category="marine-craft">
+            <div class="project-card" data-open-case="boat-redang">
+              <div class="project-media-wrap">
+                <span class="project-corner-badge">01</span>
+                <span class="project-category-tag">Craft &amp; CMF</span>
+                <img src="Img/Black and White Minimalist Designer Portfolio Presentation (1).png" alt="Boat Redang handmade miniature sailboat hero presentation" loading="lazy">
+              </div>
+              <div class="project-body">
+                <div>
+                  <div class="project-title-row">
+                    <h3 class="project-title">Boat Redang</h3>
+                    <span class="project-arrow-icon" aria-hidden="true">↗</span>
+                  </div>
+                  <p class="project-summary">
+                    A tactile miniature sailboat rooted in Pulau Redang boatbuilding heritage, translating traditional fishing craft into a collectible timber souvenir.
+                  </p>
+                  <div class="project-specs-list">
+                    <span class="tag-item">Timber Carving</span>
+                    <span class="tag-item">Hand Rigging</span>
+                    <span class="tag-item">Material CMF</span>
+                    <span class="tag-item">Exhibition Poster</span>
+                  </div>
+                </div>
+                <button type="button" class="project-action-btn">
+                  <span>View Full Case Study</span>
+                  <span aria-hidden="true">+</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROJECT 02: AGOMOTO SPEAKER -->
+          <article class="project-item reveal-on-scroll" data-category="audio-hardware">
+            <div class="project-card" data-open-case="agomoto-speaker">
+              <div class="project-media-wrap">
+                <span class="project-corner-badge">02</span>
+                <span class="project-category-tag">CAD &amp; Acoustics</span>
+                <img src="Img/Black and White Minimalist Designer Portfolio Presentation (5).png" alt="Agomoto Speaker sculptural audio render in warm gold and brushed silver" loading="lazy">
+              </div>
+              <div class="project-body">
+                <div>
+                  <div class="project-title-row">
+                    <h3 class="project-title">Agomoto Acoustic</h3>
+                    <span class="project-arrow-icon" aria-hidden="true">↗</span>
+                  </div>
+                  <p class="project-summary">
+                    A ceremonial relic-style audio transducer blending cylindrical acoustic geometry, suspended bracket framing, and dual-tone metallic finishes.
+                  </p>
+                  <div class="project-specs-list">
+                    <span class="tag-item">Fusion 360</span>
+                    <span class="tag-item">Exploded CAD</span>
+                    <span class="tag-item">KeyShot Render</span>
+                    <span class="tag-item">Surface Finish</span>
+                  </div>
+                </div>
+                <button type="button" class="project-action-btn">
+                  <span>View Full Case Study</span>
+                  <span aria-hidden="true">+</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROJECT 03: SMART BENTO -->
+          <article class="project-item reveal-on-scroll" data-category="modular-bento">
+            <div class="project-card" data-open-case="smart-bento">
+              <div class="project-media-wrap">
+                <span class="project-corner-badge">03</span>
+                <span class="project-category-tag">Systems &amp; Prototyping</span>
+                <img src="Img/Black and White Minimalist Designer Portfolio Presentation (6).png" alt="Smart Bento modular meal container prototype with blue and orange compartments" loading="lazy">
+              </div>
+              <div class="project-body">
+                <div>
+                  <div class="project-title-row">
+                    <h3 class="project-title">Smart Bento</h3>
+                    <span class="project-arrow-icon" aria-hidden="true">↗</span>
+                  </div>
+                  <p class="project-summary">
+                    A multi-tier portable lunch system designed for urban commuters, featuring leakproof dietary segregation and integrated heating alert alerts.
+                  </p>
+                  <div class="project-specs-list">
+                    <span class="tag-item">Working Prototype</span>
+                    <span class="tag-item">Ergonomic Latches</span>
+                    <span class="tag-item">Human Factors</span>
+                    <span class="tag-item">Color Coding</span>
+                  </div>
+                </div>
+                <button type="button" class="project-action-btn">
+                  <span>View Full Case Study</span>
+                  <span aria-hidden="true">+</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROJECT 04: FLUTE HUMIDIFIER -->
+          <article class="project-item reveal-on-scroll" data-category="appliance">
+            <div class="project-card" data-open-case="flute-humidifier">
+              <div class="project-media-wrap">
+                <span class="project-corner-badge">04</span>
+                <span class="project-category-tag">Concept &amp; CMF</span>
+                <img src="Img/humidifier.png" alt="Flute Mist Humidifier personal desktop appliance render in brushed copper and gold" loading="lazy">
+              </div>
+              <div class="project-body">
+                <div>
+                  <div class="project-title-row">
+                    <h3 class="project-title">Flute Mist</h3>
+                    <span class="project-arrow-icon" aria-hidden="true">↗</span>
+                  </div>
+                  <p class="project-summary">
+                    An ornamental personal desktop humidifier transforming utilitarian air moisture equipment through the rhythmic geometry and acoustic elegance of a flute.
+                  </p>
+                  <div class="project-specs-list">
+                    <span class="tag-item">Form Synthesis</span>
+                    <span class="tag-item">Ultrasonic Chimney</span>
+                    <span class="tag-item">Brushed Metal CMF</span>
+                    <span class="tag-item">Appliance Design</span>
+                  </div>
+                </div>
+                <button type="button" class="project-action-btn">
+                  <span>View Full Case Study</span>
+                  <span aria-hidden="true">+</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         04. INDUSTRIAL DESIGN METHODOLOGY (THE PROCESS PIPELINE)
+         ======================================================================= -->
+    <!-- =======================================================================
+         04. DESIGN METHODOLOGY
+         ======================================================================= -->
+    <section class="section-wrapper" id="process" aria-labelledby="process-title">
+      <div class="container">
+
+        <div class="section-head reveal-on-scroll">
+          <div>
+            <div class="section-index-badge">04. Design Methodology</div>
+            <h2 class="section-title" id="process-title">From Concept Line to Physical Form</h2>
+          </div>
+          <p class="section-description">
+            A disciplined industrial design workflow rooted in hands-on workbench iteration, parametric CAD assembly, and rigorous visual communication.
+          </p>
+        </div>
+
+        <div class="process-steps-grid reveal-on-scroll">
+          <!-- Step 1 -->
+          <div class="process-step-col">
+            <span class="step-num">01. Discovery</span>
+            <h3 class="step-title">Context &amp; User Friction</h3>
+            <p class="step-desc">Identifying ergonomic barriers, cultural opportunities, and functional constraints before drawing the first line.</p>
+            <div class="step-tool-tags">
+              <span>• Anthropometrics</span>
+              <span>• Cultural Context</span>
+              <span>• Problem Mapping</span>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="process-step-col">
+            <span class="step-num">02. Ideation</span>
+            <h3 class="step-title">Workbench Sketch &amp; Foam</h3>
+            <p class="step-desc">Rapid volumetric mockups in blue foam, clay, and thumbnail sketches to calibrate grip, weight, and silhouette balance.</p>
+            <div class="step-tool-tags">
+              <span>• Ideation Sketching</span>
+              <span>• Foam Mockups</span>
+              <span>• Proportions Testing</span>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="process-step-col">
+            <span class="step-num">03. Engineering</span>
+            <h3 class="step-title">Parametric 3D CAD</h3>
+            <p class="step-desc">Translating approved foam volumes into parametric surfaces, draft angles, wall thicknesses, and exploded assembly models.</p>
+            <div class="step-tool-tags">
+              <span>• Fusion 360</span>
+              <span>• AutoCAD Sections</span>
+              <span>• Assembly Tolerance</span>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="process-step-col">
+            <span class="step-num">04. Visuals</span>
+            <h3 class="step-title">Color, Material &amp; Finish</h3>
+            <p class="step-desc">Specifying tactile surfaces: anodized alloys, textured polymers, timber grains, specular roughness, and mood lighting.</p>
+            <div class="step-tool-tags">
+              <span>• KeyShot Rendering</span>
+              <span>• Material Boards</span>
+              <span>• Texture Calibration</span>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="process-step-col">
+            <span class="step-num">05. Build</span>
+            <h3 class="step-title">Bench Fabrication</h3>
+            <p class="step-desc">Bringing the digital asset back into the physical world via 3D printing, wood lathe turning, hand sanding, and spray finishing.</p>
+            <div class="step-tool-tags">
+              <span>• FDM 3D Printing</span>
+              <span>• Timber Joinery</span>
+              <span>• Working Verification</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         05. TECHNICAL CAPABILITIES & TOOLKIT
+         ======================================================================= -->
+    <section class="section-wrapper" id="capabilities" aria-labelledby="capabilities-title">
+      <div class="container">
+
+        <div class="section-head reveal-on-scroll">
+          <div>
+            <div class="section-index-badge">05. Technical Toolkit</div>
+            <h2 class="section-title" id="capabilities-title">Software &amp; Workshop Competencies</h2>
+          </div>
+          <p class="section-description">
+            A practical industrial design toolkit combining digital parametric modeling with tactile workshop execution.
+          </p>
+        </div>
+
+        <div class="skills-matrix-grid reveal-on-scroll">
+          <div class="skill-card">
+            <span class="skill-index">01</span>
+            <div>
+              <h3 class="skill-name">Fusion 360</h3>
+              <p class="skill-details">Parametric solid modeling, complex surface lofts, sheet metal components, and multi-part exploded mechanical assemblies.</p>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <span class="skill-index">02</span>
+            <div>
+              <h3 class="skill-name">KeyShot &amp; CMF</h3>
+              <p class="skill-details">Photorealistic raytraced studio rendering, custom material nodes, specular roughness mapping, and CMF specification documentation.</p>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <span class="skill-index">03</span>
+            <div>
+              <h3 class="skill-name">Physical Prototyping</h3>
+              <p class="skill-details">FDM 3D printing, rapid foam sculpting, silicone casting, timber shaping, priming, hand sanding, and spray booth finishing.</p>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <span class="skill-index">04</span>
+            <div>
+              <h3 class="skill-name">AutoCAD &amp; Drafting</h3>
+              <p class="skill-details">Orthographic 2D projections, dimensional callouts, tolerance verification, layout geometry, and manufacturing drawing packages.</p>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <span class="skill-index">05</span>
+            <div>
+              <h3 class="skill-name">Design Storytelling</h3>
+              <p class="skill-details">Editorial presentation boards, graphic layout architecture, typography hierarchy, and concept pitching.</p>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <span class="skill-index">06</span>
+            <div>
+              <h3 class="skill-name">After Effects &amp; Motion</h3>
+              <p class="skill-details">Motion graphics, turntable video composition, feature highlight callout animations, and product demonstration storytelling.</p>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <span class="skill-index">07</span>
+            <div>
+              <h3 class="skill-name">Human Factors</h3>
+              <p class="skill-details">Anthropometric dimensioning, user interaction flow, grip comfort, intuitive color psychology, and tactile feedback.</p>
+            </div>
+          </div>
+
+          <div class="skill-card">
+            <span class="skill-index">08</span>
+            <div>
+              <h3 class="skill-name">Design For Assembly</h3>
+              <p class="skill-details">Interlocking latches, snap fits, fastener placement, structural ribbing, and modular repairability considerations.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         06. ACADEMIC TIMELINE, COMPETITIONS & LEADERSHIP
+         ======================================================================= -->
+    <section class="section-wrapper" id="timeline" aria-labelledby="timeline-title">
+      <div class="container">
+
+        <!-- Section Header -->
+        <div class="section-head reveal-on-scroll">
+          <div>
+            <div class="section-index-badge">06. Academic Timeline &amp; Leadership</div>
+            <h2 class="section-title" id="timeline-title">Milestones, Engineering &amp; Leadership</h2>
+          </div>
+          <p class="section-description">
+            A chronological progression from foundational schooling in Perak to reading Industrial Design at UniSZA, competing in national robotics and construction challenges, and leading university multimedia operations.
+          </p>
+        </div>
+
+        <!-- 3-Part Modular Architecture -->
+        <div class="timeline-master-wrapper reveal-on-scroll">
+
+          <!-- PART 1: CHRONOLOGICAL EDUCATION & INTERNSHIP PIPELINE -->
+          <div class="timeline-block">
+            <div class="timeline-subheading">
+              <span class="timeline-sub-num">A.</span>
+              <h3 class="timeline-sub-title">Educational Milestones &amp; Progression</h3>
+            </div>
+
+            <div class="timeline-track">
+
+              <!-- Node 1: SPM -->
+              <div class="timeline-item">
+                <div class="timeline-marker">
+                  <div class="timeline-dot"></div>
+                </div>
+                <div class="timeline-card">
+                  <div class="timeline-card-header">
+                    <span class="timeline-badge">Secondary Education</span>
+                    <span class="timeline-stage-tag">SPM</span>
+                  </div>
+                  <h4 class="timeline-item-title">Sekolah Menengah Kebangsaan Hutan Melintang</h4>
+                  <div class="timeline-location">Hutan Melintang, Perak, Malaysia</div>
+                  <p class="timeline-item-desc">
+                    Sijil Pelajaran Malaysia (SPM). Core foundations in sciences, geometry, technical sketching, and early interest in physical product mechanics and workshop crafting.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Node 2: STPM -->
+              <div class="timeline-item">
+                <div class="timeline-marker">
+                  <div class="timeline-dot"></div>
+                </div>
+                <div class="timeline-card">
+                  <div class="timeline-card-header">
+                    <span class="timeline-badge">Pre-University Matriculation</span>
+                    <span class="timeline-stage-tag">STPM</span>
+                  </div>
+                  <h4 class="timeline-item-title">Sekolah Menengah Kebangsaan Khir Johari</h4>
+                  <div class="timeline-location">Sungai Sumun, Perak, Malaysia</div>
+                  <p class="timeline-item-desc">
+                    Sijil Tinggi Persekolahan Malaysia (STPM). Form 6 pre-university studies fostering analytical rigor, problem decomposition, and disciplined academic preparation for higher design studies.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Node 3: DEGREE (UniSZA) -->
+              <div class="timeline-item">
+                <div class="timeline-marker">
+                  <div class="timeline-dot active-dot"></div>
+                </div>
+                <div class="timeline-card current-education-card">
+                  <div class="timeline-card-header">
+                    <span class="timeline-badge badge-accent">Undergraduate Degree</span>
+                    <span class="timeline-stage-tag">Degree</span>
+                  </div>
+                  <h4 class="timeline-item-title">Universiti Sultan Zainal Abidin (UniSZA)</h4>
+                  <div class="timeline-degree-name">Bachelor of Industrial Design with Honours · B.ID (Hons)</div>
+                  <div class="timeline-location">Faculty of Innovative Design &amp; Technology (FRIT) · Terengganu, Malaysia</div>
+                  <p class="timeline-item-desc">
+                    Rigorous specialized curriculum encompassing Computer-Aided Industrial Design (Autodesk Fusion 360 &amp; KeyShot), ergonomic systems, workshop fabrication (FDM 3D printing, foam sculpting, timber carving), CMF strategy, and design thinking.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Node 4: PRESSURE FOR INTERNSHIP (NOW) -->
+              <div class="timeline-item">
+                <div class="timeline-marker">
+                  <div class="timeline-dot pulse-dot"></div>
+                </div>
+                <div class="timeline-card active-goal-card">
+                  <div class="timeline-card-header">
+                    <span class="timeline-badge badge-pulse">Active Focus · 2025/2026 Placement</span>
+                    <span class="timeline-stage-tag stage-now">Now</span>
+                  </div>
+                  <h4 class="timeline-item-title">Industrial Design Internship Placement</h4>
+                  <div class="timeline-degree-name">Ready for Industry Immersion &amp; Contribution</div>
+                  <p class="timeline-item-desc">
+                    Actively pursuing an industrial design internship opportunity. Equipped with hands-on CAD engineering, rapid physical prototyping, CMF specification, and multidisciplinary team leadership to immediately contribute to live product development cycles.
+                  </p>
+                  <div class="internship-actions">
+                    <a href="#contact" class="timeline-cta-btn">Initiate Discussion ↗</a>
+                    <button type="button" class="timeline-cta-ghost" data-copy-email="thanushpatthas@gmail.com">Copy Email Address</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- PART 2: MAJOR COMPETITIONS -->
+          <div class="timeline-block">
+            <div class="timeline-subheading">
+              <span class="timeline-sub-num">B.</span>
+              <h3 class="timeline-sub-title">Major Engineering &amp; Design Competitions</h3>
+            </div>
+
+            <div class="competitions-grid">
+              
+              <!-- Competition 1: PIRC 2026 -->
+              <div class="competition-card">
+                <div class="comp-header">
+                  <div class="comp-year-badge">2026</div>
+                  <span class="comp-role-badge">Hardware Technical Team</span>
+                </div>
+                <h4 class="comp-title">Perak International Robot Competition (PIRC)</h4>
+                <div class="comp-team-label">Universiti Sultan Zainal Abidin (UniSZA) Contingent</div>
+                <p class="comp-desc">
+                  Served on the core hardware technical engineering team, responsible for robotic structural assembly, hardware troubleshooting, chassis mounting precision, component calibration, and real-time competition durability under high-stress match conditions.
+                </p>
+                <div class="comp-tags-wrap">
+                  <span class="tag-item">Hardware Engineering</span>
+                  <span class="tag-item">Mechanical Assembly</span>
+                  <span class="tag-item">UniSZA Team</span>
+                  <span class="tag-item">Rapid Troubleshooting</span>
+                </div>
+              </div>
+
+              <!-- Competition 2: The Game Daxd Challenge -->
+              <div class="competition-card">
+                <div class="comp-header">
+                  <div class="comp-year-badge">Challenge</div>
+                  <span class="comp-role-badge">Construction &amp; Planning</span>
+                </div>
+                <h4 class="comp-title">The Game Daxd Challenge</h4>
+                <div class="comp-team-label">Construction &amp; Spatial Planning</div>
+                <p class="comp-desc">
+                  Directed the construction methodology and strategic spatial planning, synthesizing dimensional constraints, build sequencing, material allocation, and physical structure modeling to execute competitive objectives efficiently.
+                </p>
+                <div class="comp-tags-wrap">
+                  <span class="tag-item">Construction Strategy</span>
+                  <span class="tag-item">Spatial Planning</span>
+                  <span class="tag-item">Structural Modeling</span>
+                  <span class="tag-item">Execution Logistics</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- PART 3: UNIVERSITY PROGRAMS & MULTIMEDIA EXCO LEADERSHIP -->
+          <div class="timeline-block">
+            <div class="timeline-subheading">
+              <span class="timeline-sub-num">C.</span>
+              <h3 class="timeline-sub-title">University Programs &amp; Multimedia Leadership</h3>
+            </div>
+            
+            <p class="leadership-lead-text">
+              Demonstrated track record of directing multimedia branding, creative publicity campaigns, and community engagement initiatives across prominent campus and state-level programs.
+            </p>
+
+            <div class="programs-grid">
+
+              <!-- Program 1 -->
+              <div class="program-item-card">
+                <div class="program-role-tag">Exco Multimedia</div>
+                <h4 class="program-name">ICS (Indian Cultural Society)</h4>
+                <p class="program-detail">Spearheaded organization-wide multimedia branding, promotional digital collateral, social media identity, and live event media production.</p>
+              </div>
+
+              <!-- Program 2 -->
+              <div class="program-item-card">
+                <div class="program-role-tag">Exco Multimedia</div>
+                <h4 class="program-name">Thikethum Minnithum 2.0</h4>
+                <p class="program-detail">Directed creative visual direction, promotional posters, motion assets, and digital outreach for the university's flagship cultural celebration.</p>
+              </div>
+
+              <!-- Program 3 -->
+              <div class="program-item-card">
+                <div class="program-role-tag">Exco Multimedia</div>
+                <h4 class="program-name">Thaaalam X</h4>
+                <p class="program-detail">Engineered stage visual packages, promotional marketing releases, and multimedia coverage for major artistic performance showcase.</p>
+              </div>
+
+              <!-- Program 4 -->
+              <div class="program-item-card">
+                <div class="program-role-tag">Exco Multimedia</div>
+                <h4 class="program-name">Horror Run</h4>
+                <p class="program-detail">Produced immersive thematic campaign visuals, promotional video assets, bib design, and digital merchandise assets for campus sports initiative.</p>
+              </div>
+
+              <!-- Program 5 -->
+              <div class="program-item-card">
+                <div class="program-role-tag">Exco Multimedia</div>
+                <h4 class="program-name">Jalinan Kasih</h4>
+                <p class="program-detail">Led visual storytelling and documentary media for community welfare outreach, capturing human impact narratives and public communications.</p>
+              </div>
+
+              <!-- Program 6 -->
+              <div class="program-item-card">
+                <div class="program-role-tag">Exco Multimedia</div>
+                <h4 class="program-name">Silang Budaya 2.0</h4>
+                <p class="program-detail">Managed cross-cultural festival identity, digital promotional rollout, and multi-format display graphics celebrating cultural diversity.</p>
+              </div>
+
+              <!-- Program 7 -->
+              <div class="program-item-card program-highlight-card">
+                <div class="program-role-tag tag-community">Community &amp; Event Coordination</div>
+                <h4 class="program-name">Aktiviti E-Sukan Bersama Komuniti KG. Baru Pulau Redang</h4>
+                <p class="program-detail">Organized community e-sports engagement and event coordination directly with the Kampung Baru island community in Pulau Redang—fostering deep grassroots cultural immersion that also informed the Boat Redang industrial design project.</p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         07. ABOUT THE DESIGNER (PROMINENT REAL PICTURES)
+         Featuring BOTH `thanush_proffesional.png` and `formal_me.jpg`
+         ======================================================================= -->
+    <section class="section-wrapper" id="about" aria-labelledby="about-title">
+      <div class="container">
+
+        <div class="section-head reveal-on-scroll">
+          <div>
+            <div class="section-index-badge">07. Profile &amp; Background</div>
+            <h2 class="section-title" id="about-title">Curiosity Rooted in How Things Hold Together</h2>
+          </div>
+        </div>
+
+        <div class="about-dual-showcase">
+          
+          <!-- Column 1: Narrative & Degree Credentials -->
+          <div class="about-bio-column reveal-on-scroll">
+            <div class="about-intro-statement">
+              "An object is not just a form; it is a physical conversation between materials, human hands, and everyday rituals."
+            </div>
+
+            <p class="about-bio-paragraph">
+              I am <strong>Thanush Puvanesvaran</strong>, an industrial designer currently undertaking my degree in Industrial Design at Universiti Sultan Zainal Abidin (UniSZA) in Terengganu, Malaysia.
+            </p>
+
+            <p class="about-bio-paragraph">
+              My approach connects industrial discipline with craft sensitivity. Whether I am carving miniature timber hulls for cultural souvenirs or generating parametric CAD housings for audio hardware and ultrasonic appliances, I focus on the moment when an abstract concept gains weight, texture, and a genuine reason to exist.
+            </p>
+
+            <!-- UniSZA Degree Box -->
+            <div class="about-academic-box">
+              <div class="academic-label">Academic Credentials &amp; Faculty</div>
+              <div class="academic-degree">Bachelor of Industrial Design (Hons)</div>
+              <div class="academic-institution">Faculty of Innovative Design &amp; Technology (FRIT) · Universiti Sultan Zainal Abidin (UniSZA)</div>
+              <p style="margin-top: 8px; font-size: 0.84rem; color: var(--text-muted); font-family: var(--font-body);">
+                Specialization: Computer-Aided Industrial Design, Ergonomic Systems, Model Making &amp; CMF
+              </p>
+            </div>
+
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+              <a href="#contact" class="filter-btn active" style="padding: 10px 22px;">Get In Touch</a>
+              <button type="button" class="filter-btn" data-copy-email="thanushpatthas@gmail.com">Copy Email</button>
+            </div>
+          </div>
+
+          <!-- Column 2: Prominent Dual Real Pictures -->
+          <div class="portrait-dual-gallery reveal-on-scroll">
+            
+            <!-- Photo 1: Thanush in Studio/Designer Work Mode -->
+            <div class="portrait-card">
+              <div class="portrait-card-media">
+                <img src="Img/thanush_proffesional.png" alt="Thanush Puvanesvaran — Industrial Designer working with headphones and digital tablet" loading="lazy">
+              </div>
+              <div class="portrait-meta-footer">
+                <span class="portrait-label">Studio &amp; Creative Profile</span>
+                <span class="portrait-caption">Thanush Puvanesvaran · Studio</span>
+              </div>
+            </div>
+
+            <!-- Photo 2: Thanush Formal Portrait -->
+            <div class="portrait-card">
+              <div class="portrait-card-media">
+                <img src="Img/formal_me.jpg" alt="Thanush Puvanesvaran — Formal Professional Portrait" loading="lazy">
+              </div>
+              <div class="portrait-meta-footer">
+                <span class="portrait-label">Executive &amp; Industry Profile</span>
+                <span class="portrait-caption">Thanush Puvanesvaran · Formal</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       08. CONTACT & INQUIRIES
+       ========================================================================= -->
+  <footer class="contact-section" id="contact" aria-labelledby="contact-title">
+    <div class="container">
+      <div class="contact-layout">
+        
+        <div>
+          <div class="section-index-badge" style="margin-bottom: 16px;">08. Contact &amp; Collaboration</div>
+          <h2 class="contact-headline" id="contact-title">Have a project or collaboration in mind?</h2>
+          <p class="contact-blurb">
+            I am open to industrial design internships, studio collaborations, and junior product design opportunities for 2025/2026. Let's engineer something meaningful.
+          </p>
+        </div>
+
+        <div class="contact-channels">
+          <a href="#" class="contact-action-row" data-copy-email="thanushpatthas@gmail.com" title="Click to copy email address">
+            <span>thanushpatthas@gmail.com</span>
+            <span class="action-type-tag">Copy Email ↗</span>
+          </a>
+
+          <a href="tel:+601136712501" class="contact-action-row">
+            <span>+60 11-3671 2501</span>
+            <span class="action-type-tag">Direct Call ↗</span>
+          </a>
+
+          <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="contact-action-row">
+            <span>LinkedIn Profile</span>
+            <span class="action-type-tag">Connect ↗</span>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Footer Bottom Bar -->
+      <div class="footer-bar">
+        <span>© 2025 Thanush Puvanesvaran · Industrial &amp; Product Design</span>
+        <span>Universiti Sultan Zainal Abidin (UniSZA) · Terengganu, Malaysia</span>
+        <span>Available for Worldwide Opportunities</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       08. INTERACTIVE CASE STUDY DRAWER OVERLAY
+       ========================================================================= -->
+  <div class="case-study-overlay" id="case-study-overlay" role="dialog" aria-modal="true" aria-label="Project Case Study Deep Dive">
+    <div class="case-study-drawer">
+      <div class="drawer-header">
+        <span class="section-index-badge">Case Study Deep Dive</span>
+        <button type="button" class="drawer-close-btn" id="drawer-close-btn" aria-label="Close Case Study">
+          <span>Close</span>
+          <span aria-hidden="true">✕</span>
+        </button>
+      </div>
+      <div class="drawer-body" id="drawer-body">
+        <!-- Dynamically injected via js/main.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       09. FULLSCREEN IMAGE LIGHTBOX MODAL
+       ========================================================================= -->
+  <div class="lightbox-modal" id="lightbox-modal" role="dialog" aria-modal="true" aria-label="Full Resolution Image Viewer">
+    <button type="button" class="lightbox-close-btn" id="lightbox-close-btn" aria-label="Close Image Viewer">✕</button>
+    <button type="button" class="lightbox-nav-btn lightbox-prev" id="lightbox-prev" aria-label="Previous Image">‹</button>
+    <button type="button" class="lightbox-nav-btn lightbox-next" id="lightbox-next" aria-label="Next Image">›</button>
+    
+    <div class="lightbox-img-wrapper">
+      <img src="" alt="" class="lightbox-img" id="lightbox-img">
+    </div>
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- Toast Message Element -->
+  <div class="toast-msg" id="toast-msg" role="status" aria-live="polite">Email copied to clipboard!</div>
+
+  <!-- Dedicated External JavaScript -->
+  <script src="js/main.js"></script>
+</body>
+</html>

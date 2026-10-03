@@ -13,24 +13,24 @@ This portfolio showcases physical objects, parametric 3D CAD assemblies, worksho
 - **Smart Bento** — modular systems and prototyping
 - **Flute Mist** — personal appliance concept and CMF
 
-The website includes an interactive Three.js CAD viewport, project case-study drawer, lightbox gallery, responsive navigation, and white/dark theme modes. Images are optimised WebP, motion respects `prefers-reduced-motion`, and the case-study dialogs are keyboard accessible.
+The website includes an interactive Three.js CAD viewport that loads the real Agomoto B-rep model (`models/agomoto.glb`, tessellated from the original Rhino `.3dm` file) with shaded CMF, B-rep wireframe, clay and exploded-view modes, project case-study drawer, lightbox gallery, responsive navigation, and white/dark theme modes. Images are optimised WebP, motion respects `prefers-reduced-motion`, and the case-study dialogs are keyboard accessible.
 
 ## Technology
 
 - HTML5, CSS3, and vanilla JavaScript
-- Three.js r128 for the interactive CAD viewport
+- Three.js r128 (CDN) plus a vendored `js/vendor/GLTFLoader.js` for the interactive CAD viewport
 - Google Fonts: Space Grotesk, Plus Jakarta Sans, and JetBrains Mono
 - HTML5 Canvas and CSS ambient studio effects
 
 ## Run locally
 
-Open `index.html` directly in a modern browser, or serve the project locally:
+Serve the project locally (the 3D model is loaded with `fetch`, so opening `index.html` straight from disk shows a static render instead of the live model):
 
 ```bash
 python -m http.server 8080
 ```
 
-Then visit `http://localhost:8080`.
+Then visit `http://localhost:8080`. On GitHub Pages everything works as-is; all asset paths are relative and lower-case.
 
 ## Contact & Industry Inquiries
 

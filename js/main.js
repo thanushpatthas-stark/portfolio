@@ -234,17 +234,7 @@ const caseStudies = {
         caption: 'Boat Redang Trio — Handcrafted hull profiles with custom dyed sails and rigging'
       },
       {
-        src: 'Img/design-development-board.webp',
-        col: 'col-6',
-        caption: 'Design Development Board — Nautical inspiration, form exploration & material selections'
-      },
-      {
-        src: 'Img/boat-redang-process.webp',
-        col: 'col-6',
-        caption: 'Craft Process & Technical Breakdown — Rigging assemblies, timber carving & jointing'
-      },
-      {
-        src: 'Img/boat-redang-detail.webp',
+        src: 'Img/boat-redang-sailboat.webp',
         col: 'col-6',
         caption: 'Detailed Silhouette — Single Boat Redang miniature showcasing brass grommets and deck'
       },
@@ -290,17 +280,17 @@ const caseStudies = {
       {
         src: 'Img/agomoto-technical-poster.webp',
         col: 'col-12',
-        caption: 'Agomoto Technical Poster — Exploded CAD view, component breakdown & driver chamber'
+        caption: 'Agomoto Technical Poster — CAD renders beside the 3D-printed prototypes'
       },
       {
-        src: 'Img/agomoto-hero-render.webp',
+        src: 'Img/agomoto-render.webp',
         col: 'col-6',
         caption: 'Studio Hero Render — Dual-tone metallic finish under directional studio lighting'
       },
       {
-        src: 'Img/design-development-board.webp',
+        src: 'Img/agomoto-concept-poster.webp',
         col: 'col-6',
-        caption: 'Concept Development Board — Form language studies and acoustic volume calculations'
+        caption: 'Agomoto Concept Poster — Design concept, form language and exploded views'
       }
     ]
   },
@@ -337,14 +327,14 @@ const caseStudies = {
     ],
     gallery: [
       {
-        src: 'Img/smart-bento-prototype.webp',
+        src: 'Img/smart-bento-prototype-render.webp',
         col: 'col-7',
-        caption: 'Physical Working Prototype — Open and closed tiered modular configuration'
+        caption: 'Working Prototype Render — Tiered modular container in cobalt blue and safety orange'
       },
       {
-        src: 'Img/smart-bento-ergonomics-board.webp',
+        src: 'Img/smart-bento-enclosure-study.webp',
         col: 'col-5',
-        caption: 'Design & Ergonomics Board — User flow, compartment breakdown & latch mechanics'
+        caption: 'Enclosure Study — Lid form and vent-port layout'
       }
     ]
   },
@@ -382,13 +372,18 @@ const caseStudies = {
     gallery: [
       {
         src: 'Img/flute-mist-concept-board.webp',
-        col: 'col-7',
+        col: 'col-4',
         caption: 'Flute Humidifier Concept Board — Main perspective, feature callouts & mist stream'
       },
       {
-        src: 'Img/flute-mist-form-studies.webp',
-        col: 'col-5',
-        caption: 'Form & CMF Studies — Geometry derivations, handle ergonomics & vent alignments'
+        src: 'Img/flute-mist-cad-front.webp',
+        col: 'col-4',
+        caption: 'CAD Study (front) — Chimney, vented collar and curved carry handle'
+      },
+      {
+        src: 'Img/flute-mist-cad-side.webp',
+        col: 'col-4',
+        caption: 'CAD Study (side) — Geometry derivations, handle ergonomics & vent alignments'
       }
     ]
   }
@@ -690,13 +685,37 @@ function initHeroPortraitSwitcher() {
 
 /* --------------------------------------------------------------------------
    09. INTERACTIVE 3D CAD MODELING VIEWPORT (THREE.JS ENGINE)
-   Showcases Agomoto Acoustic Speaker Assembly with Wireframe/CMF/Clay & Explode
+   Loads the real Agomoto B-rep model (models/agomoto.glb) with CMF / Wireframe / Clay & Explode
    -------------------------------------------------------------------------- */
+const CAD_MODEL_URL = 'models/agomoto.glb';
+const CAD_MODEL_SCALE = 0.2;                       // model is authored in centimetres
+const CAD_GROUND_Y = -9.05;                        // underside of the base (model space, cm)
+const CAD_HOME = { rotX: 0.16, rotY: -0.55, camZ: 7.6, camY: 0.4 };
+
+// CMF specification per assembly group (polished bronze, champagne gold, stainless steel)
+const CAD_PALETTE = {
+  base:    { color: 0x7d5c26, metalness: 1.0, roughness: 0.17 },
+  cradle:  { color: 0xd8bd88, metalness: 1.0, roughness: 0.22 },
+  drum:    { color: 0xcbd0d8, metalness: 1.0, roughness: 0.20 },
+  front:   { color: 0xd9ae55, metalness: 1.0, roughness: 0.20 },
+  plate:   { color: 0x3a2e1a, metalness: 0.9, roughness: 0.38 },
+  back:    { color: 0x2a261f, metalness: 0.8, roughness: 0.42 },
+  handleL: { color: 0x8b642a, metalness: 1.0, roughness: 0.16 },
+  handleR: { color: 0x8b642a, metalness: 1.0, roughness: 0.16 }
+};
+
+// Exploded-view travel per assembly group (cm; x right, y up, z toward the viewer)
+const CAD_EXPLODE = {
+  base: [0, -4.5, 0], cradle: [0, -2.0, 0], drum: [0, 0, 0],
+  plate: [0, 0, 3.2], front: [0, 0, 7.5], back: [0, 0, -7.5],
+  handleL: [-5.5, 0, 0], handleR: [5.5, 0, 0]
+};
+
 function showCadFallback(container, message) {
   container.innerHTML = '';
   const img = document.createElement('img');
   img.className = 'cad-fallback-img';
-  img.src = 'Img/agomoto-hero-render.webp';
+  img.src = 'Img/agomoto-render.webp';
   img.alt = 'Render of the Agomoto acoustic speaker';
   container.appendChild(img);
   container.title = message;
@@ -707,26 +726,72 @@ function showCadFallback(container, message) {
   if (coords) coords.textContent = message;
 }
 
+/** Soft-box studio environment so the metals have something believable to reflect. */
+function createStudioEnvironment(renderer) {
+  const env = new THREE.Scene();
+  env.add(new THREE.Mesh(
+    new THREE.SphereGeometry(60, 32, 16),
+    new THREE.MeshBasicMaterial({ color: 0x25272c, side: THREE.BackSide })
+  ));
+
+  function softbox(w, h, pos, color, intensity) {
+    const mesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(w, h),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity), side: THREE.DoubleSide })
+    );
+    mesh.position.set(pos[0], pos[1], pos[2]);
+    mesh.lookAt(0, 0, 0);
+    env.add(mesh);
+  }
+
+  softbox(46, 46, [0, 32, 2], 0xffffff, 7);        // overhead key
+  softbox(14, 34, [-30, 6, 22], 0xfff0dc, 5);      // warm front-left strip
+  softbox(9, 36, [32, 4, 8], 0xd9e6ff, 3.2);       // cool right strip
+  softbox(46, 12, [0, 6, -32], 0xffffff, 3);       // rim from behind
+  softbox(40, 6, [0, -22, 18], 0xffe9cf, 1.4);     // low warm bounce
+
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const texture = pmrem.fromScene(env, 0.035).texture;
+  pmrem.dispose();
+  return texture;
+}
+
+function createGroundShadow() {
+  const size = 256;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = size;
+  const g = cv.getContext('2d');
+  const grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, 'rgba(0,0,0,0.42)');
+  grad.addColorStop(0.45, 'rgba(0,0,0,0.18)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, size, size);
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(22, 22),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false })
+  );
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.renderOrder = -1;
+  return mesh;
+}
+
 function init3DCADViewport() {
   const container = document.getElementById('cad-canvas-container');
   if (!container) return;
 
-  // Verify Three.js availability
-  if (typeof THREE === 'undefined') {
+  if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined') {
     showCadFallback(container, '3D engine unavailable. Showing a static render instead.');
     return;
   }
 
-  // Sizing
   const width = container.clientWidth || 400;
   const height = container.clientHeight || 360;
 
-  // Scene & Camera
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 50);
-  camera.position.set(0, 0.6, 6.4);
+  const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 60);
+  camera.position.set(0, CAD_HOME.camY, CAD_HOME.camZ);
 
-  // WebGL Renderer
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -737,213 +802,139 @@ function init3DCADViewport() {
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.95;
   container.appendChild(renderer.domElement);
 
-  // Lighting System
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
-  scene.add(ambientLight);
+  scene.environment = createStudioEnvironment(renderer);
 
-  const keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
+  const keyLight = new THREE.DirectionalLight(0xffffff, 0.55);
   keyLight.position.set(5, 8, 7);
   scene.add(keyLight);
 
-  const fillLight = new THREE.DirectionalLight(0x90b0e0, 0.5);
-  fillLight.position.set(-6, -2, -4);
-  scene.add(fillLight);
+  // Rotating assembly (scaled from cm); the ground shadow lives inside so it follows the turntable
+  const assembly = new THREE.Group();
+  assembly.scale.setScalar(CAD_MODEL_SCALE);
+  assembly.rotation.set(CAD_HOME.rotX, CAD_HOME.rotY, 0);
+  scene.add(assembly);
 
-  const rimLight = new THREE.PointLight(0xffffff, 0.7, 10);
-  rimLight.position.set(0, 3, -3);
-  scene.add(rimLight);
-
-  // Root Assembly Group
-  const assemblyGroup = new THREE.Group();
-  scene.add(assemblyGroup);
-
-  // Initial Rotation
-  assemblyGroup.rotation.x = 0.28;
-  assemblyGroup.rotation.y = -0.42;
+  const shadow = createGroundShadow();
+  shadow.position.y = CAD_GROUND_Y;
+  assembly.add(shadow);
 
   // ------------------------------------------------------------------------
-  // MATERIAL PALETTES (CMF, WIREFRAME & CLAY)
+  // MATERIALS
   // ------------------------------------------------------------------------
-  const materials = {
-    cmfGold: new THREE.MeshStandardMaterial({
-      color: 0xd4a55d,
-      metalness: 0.85,
-      roughness: 0.22,
-      envMapIntensity: 1.0
-    }),
-    cmfAlloy: new THREE.MeshStandardMaterial({
-      color: 0xc8ced6,
-      metalness: 0.75,
-      roughness: 0.35
-    }),
-    cmfDarkGraphite: new THREE.MeshStandardMaterial({
-      color: 0x1c1e23,
-      metalness: 0.4,
-      roughness: 0.5
-    }),
-    cmfEmissiveBlue: new THREE.MeshStandardMaterial({
-      color: 0x185adb,
-      emissive: 0x185adb,
-      emissiveIntensity: 0.9,
-      roughness: 0.2
-    }),
-    wireframe: new THREE.MeshBasicMaterial({
-      color: 0x185adb,
-      wireframe: true
-    }),
-    clay: new THREE.MeshStandardMaterial({
-      color: 0xdcdbd6,
-      roughness: 0.92,
-      metalness: 0.05
-    })
-  };
+  const surfaceOffset = { polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1, side: THREE.DoubleSide };
+  const cmfMaterials = {};
+  Object.keys(CAD_PALETTE).forEach(name => {
+    cmfMaterials[name] = new THREE.MeshStandardMaterial(Object.assign({ envMapIntensity: 1.15 }, CAD_PALETTE[name], surfaceOffset));
+  });
+  const clayMaterial = new THREE.MeshStandardMaterial(Object.assign({ color: 0xe6e3dc, roughness: 0.88, metalness: 0.0, envMapIntensity: 0.55 }, surfaceOffset));
+  const ghostMaterial = new THREE.MeshBasicMaterial({ color: 0x185adb, transparent: true, opacity: 0.06, depthWrite: false, side: THREE.DoubleSide });
+  const wireLineMaterial = new THREE.LineBasicMaterial({ color: 0x185adb, transparent: true, opacity: 0.95 });
+  const clayLineMaterial = new THREE.LineBasicMaterial({ color: 0x20242b, transparent: true, opacity: 0.28 });
 
+  // ------------------------------------------------------------------------
+  // MODEL LOADING (real B-rep tessellation exported from the .3dm CAD file)
+  // ------------------------------------------------------------------------
+  const parts = {};   // group name -> { mesh, lines }
   let currentMode = 'cmf';
+  let modelReady = false;
+  let explodeFactor = 0;
 
-  // ------------------------------------------------------------------------
-  // PARAMETRIC 3D GEOMETRY CONSTRUCTION (AGOMOTO ACOUSTIC SPEAKER)
-  // ------------------------------------------------------------------------
-  // Part 1: Main Acoustic Resonance Enclosure (Body)
-  const partBody = new THREE.Group();
-  const bodyGeo = new THREE.CylinderGeometry(1.3, 1.3, 2.0, 36);
-  const bodyMesh = new THREE.Mesh(bodyGeo, materials.cmfAlloy);
-  partBody.add(bodyMesh);
+  const loading = document.createElement('div');
+  loading.className = 'cad-loading';
+  loading.setAttribute('role', 'status');
+  loading.textContent = 'Loading 3D model…';
+  container.appendChild(loading);
 
-  // Decorative CNC Cooling Fins
-  for (let i = -0.6; i <= 0.6; i += 0.3) {
-    const finGeo = new THREE.TorusGeometry(1.32, 0.025, 12, 36);
-    const finMesh = new THREE.Mesh(finGeo, materials.cmfGold);
-    finMesh.rotation.x = Math.PI / 2;
-    finMesh.position.y = i;
-    partBody.add(finMesh);
+  function groupName(obj) {
+    const raw = obj.name || (obj.parent && obj.parent.name) || '';
+    return raw.replace(/_edges$/, '');
   }
-  assemblyGroup.add(partBody);
 
-  // Part 2: Base Pedestal Stand
-  const partBase = new THREE.Group();
-  const baseGeo = new THREE.CylinderGeometry(1.5, 1.65, 0.4, 32);
-  const baseMesh = new THREE.Mesh(baseGeo, materials.cmfDarkGraphite);
-  partBase.add(baseMesh);
-
-  const baseRimGeo = new THREE.TorusGeometry(1.65, 0.04, 12, 36);
-  const baseRimMesh = new THREE.Mesh(baseRimGeo, materials.cmfGold);
-  baseRimMesh.rotation.x = Math.PI / 2;
-  baseRimMesh.position.y = -0.18;
-  partBase.add(baseRimMesh);
-  partBase.position.y = -1.2;
-  assemblyGroup.add(partBase);
-
-  // Part 3: Inner Transducer Core & Magnetic Driver
-  const partCore = new THREE.Group();
-  const coreGeo = new THREE.CylinderGeometry(0.82, 0.82, 1.5, 24);
-  const coreMesh = new THREE.Mesh(coreGeo, materials.cmfDarkGraphite);
-  partCore.add(coreMesh);
-
-  // Luminous Status Ring
-  const coreStatusGeo = new THREE.TorusGeometry(0.85, 0.045, 16, 32);
-  const coreStatusMesh = new THREE.Mesh(coreStatusGeo, materials.cmfEmissiveBlue);
-  coreStatusMesh.rotation.x = Math.PI / 2;
-  partCore.add(coreStatusMesh);
-  partCore.position.z = -0.15;
-  assemblyGroup.add(partCore);
-
-  // Part 4: Acoustic Diaphragm Cone & Center Dust Dome
-  const partDiaphragm = new THREE.Group();
-  const coneGeo = new THREE.ConeGeometry(1.15, 0.55, 32, 1, true);
-  const coneMesh = new THREE.Mesh(coneGeo, materials.cmfDarkGraphite);
-  coneMesh.rotation.x = -Math.PI / 2;
-  partDiaphragm.add(coneMesh);
-
-  const domeGeo = new THREE.SphereGeometry(0.36, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.5);
-  const domeMesh = new THREE.Mesh(domeGeo, materials.cmfGold);
-  domeMesh.position.z = 0.28;
-  domeMesh.rotation.x = Math.PI / 2;
-  partDiaphragm.add(domeMesh);
-  partDiaphragm.position.z = 0.45;
-  assemblyGroup.add(partDiaphragm);
-
-  // Part 5: Outer Suspension Ring & Protective Bracket (Eye of Agamotto)
-  const partRing = new THREE.Group();
-  const ringGeo = new THREE.TorusGeometry(1.68, 0.09, 16, 48);
-  const ringMesh = new THREE.Mesh(ringGeo, materials.cmfGold);
-  partRing.add(ringMesh);
-
-  // 4 Radial Suspension Bracket Arms
-  for (let a = 0; a < 4; a++) {
-    const armGeo = new THREE.BoxGeometry(0.08, 0.4, 0.08);
-    const armMesh = new THREE.Mesh(armGeo, materials.cmfAlloy);
-    const angle = (a * Math.PI) / 2 + Math.PI / 4;
-    armMesh.position.set(Math.cos(angle) * 1.5, Math.sin(angle) * 1.5, 0);
-    armMesh.rotation.z = angle;
-    partRing.add(armMesh);
+  function onModelLoaded(gltf) {
+    gltf.scene.traverse(obj => {
+      if (!(obj.isMesh || obj.isLine)) return;
+      const name = groupName(obj);
+      if (!name) return;
+      parts[name] = parts[name] || {};
+      if (obj.isMesh) parts[name].mesh = obj; else parts[name].lines = obj;
+    });
+    assembly.add(gltf.scene);
+    loading.remove();
+    modelReady = true;
+    setRenderMode(currentMode);
+    updateExplodedAssembly(explodeFactor);
+    resumeRendering();
   }
-  partRing.position.z = 0.72;
-  assemblyGroup.add(partRing);
 
-  // Part 6: Top Knurled Volume Control Dial
-  const partDial = new THREE.Group();
-  const dialGeo = new THREE.CylinderGeometry(0.65, 0.65, 0.28, 28);
-  const dialMesh = new THREE.Mesh(dialGeo, materials.cmfGold);
-  partDial.add(dialMesh);
+  function onModelError() {
+    loading.remove();
+    showCadFallback(container, 'Could not load the 3D model. Showing a static render instead.');
+    cancelAnimationFrame(frameId);
+    frameId = 0;
+    renderer.dispose();
+  }
 
-  const dialIndicatorGeo = new THREE.BoxGeometry(0.06, 0.3, 0.12);
-  const dialIndicatorMesh = new THREE.Mesh(dialIndicatorGeo, materials.cmfDarkGraphite);
-  dialIndicatorMesh.position.set(0, 0, 0.3);
-  partDial.add(dialIndicatorMesh);
-  partDial.position.y = 1.15;
-  assemblyGroup.add(partDial);
+  function startLoading() {
+    const loader = new THREE.GLTFLoader();
+    loader.load(CAD_MODEL_URL, onModelLoaded, (xhr) => {
+      if (xhr.lengthComputable && xhr.total) {
+        loading.textContent = `Loading 3D model… ${Math.round((xhr.loaded / xhr.total) * 100)}%`;
+      }
+    }, onModelError);
+  }
 
-  // Reference Base Positions for Exploded Calculation
-  const basePositions = {
-    ringZ: 0.72,
-    diaphragmZ: 0.45,
-    coreZ: -0.15,
-    dialY: 1.15,
-    baseY: -1.2
-  };
-
-  // Exploded Assembly Function
-  function updateExplodedAssembly(factor) {
-    partRing.position.z = basePositions.ringZ + factor * 2.3;
-    partDiaphragm.position.z = basePositions.diaphragmZ + factor * 1.5;
-    partCore.position.z = basePositions.coreZ - factor * 1.6;
-    partDial.position.y = basePositions.dialY + factor * 1.3;
-    partBase.position.y = basePositions.baseY - factor * 1.3;
+  // Only fetch the model once the viewport is close to the screen
+  if ('IntersectionObserver' in window) {
+    const loadObserver = new IntersectionObserver((entries, obs) => {
+      if (entries.some(e => e.isIntersecting)) {
+        obs.disconnect();
+        startLoading();
+      }
+    }, { rootMargin: '600px 0px' });
+    loadObserver.observe(container);
+  } else {
+    startLoading();
   }
 
   // ------------------------------------------------------------------------
-  // RENDER MODE SWITCHER (SHADED CMF, WIREFRAME, CLAY)
+  // RENDER MODES + EXPLODED ASSEMBLY
   // ------------------------------------------------------------------------
   function setRenderMode(mode) {
     currentMode = mode;
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    materials.wireframe.color.setHex(isDark ? 0x38bdf8 : 0x185adb);
+    wireLineMaterial.color.setHex(isDark ? 0x38bdf8 : 0x185adb);
+    ghostMaterial.color.setHex(isDark ? 0x38bdf8 : 0x185adb);
 
-    assemblyGroup.traverse((child) => {
-      if (child.isMesh) {
-        if (mode === 'wire') {
-          child.material = materials.wireframe;
-        } else if (mode === 'clay') {
-          child.material = materials.clay;
-        } else {
-          // Restore CMF Palette
-          if (child === ringMesh || child === domeMesh || child === dialMesh || child.geometry.type === 'TorusGeometry') {
-            child.material = materials.cmfGold;
-          } else if (child === coreStatusMesh) {
-            child.material = materials.cmfEmissiveBlue;
-          } else if (child === baseMesh || child === coneMesh || child === coreMesh || child === dialIndicatorMesh) {
-            child.material = materials.cmfDarkGraphite;
-          } else {
-            child.material = materials.cmfAlloy;
-          }
-        }
+    Object.keys(parts).forEach(name => {
+      const part = parts[name];
+      if (part.mesh) {
+        part.mesh.material = mode === 'wire' ? ghostMaterial : mode === 'clay' ? clayMaterial : (cmfMaterials[name] || clayMaterial);
+      }
+      if (part.lines) {
+        part.lines.visible = mode !== 'cmf';
+        part.lines.material = mode === 'wire' ? wireLineMaterial : clayLineMaterial;
       }
     });
   }
 
-  // Mode Buttons
+  function updateExplodedAssembly(factor) {
+    explodeFactor = factor;
+    Object.keys(parts).forEach(name => {
+      const off = CAD_EXPLODE[name] || [0, 0, 0];
+      ['mesh', 'lines'].forEach(kind => {
+        const obj = parts[name][kind];
+        if (obj) obj.position.set(off[0] * factor, off[1] * factor, off[2] * factor);
+      });
+    });
+    // keep the whole exploded assembly inside the frame, and keep the shadow under the base
+    assembly.scale.setScalar(CAD_MODEL_SCALE * (1 - 0.3 * factor));
+    shadow.position.y = CAD_GROUND_Y + CAD_EXPLODE.base[1] * factor;
+  }
+
   const modeBtns = document.querySelectorAll('[data-cad-mode]');
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -954,23 +945,25 @@ function init3DCADViewport() {
       btn.classList.add('active');
       btn.setAttribute('aria-pressed', 'true');
       setRenderMode(btn.getAttribute('data-cad-mode'));
+      resumeRendering();
     });
   });
 
-  // Explode Slider
   const explodeSlider = document.getElementById('cad-explode-slider');
   const explodeValDisplay = document.getElementById('explode-val-display');
 
   if (explodeSlider) {
     explodeSlider.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
-      const factor = val / 100;
-      updateExplodedAssembly(factor);
+      updateExplodedAssembly(val / 100);
       if (explodeValDisplay) explodeValDisplay.textContent = `${Math.round(val)}%`;
+      resumeRendering();
     });
   }
 
-  // Turntable Auto-Rotate Button
+  // ------------------------------------------------------------------------
+  // TURNTABLE, RESET, ORBIT, ZOOM
+  // ------------------------------------------------------------------------
   let autoRotate = !prefersReducedMotion.matches;
   const btnAutorotate = document.getElementById('cad-btn-autorotate');
   const autorotateIndicator = document.getElementById('autorotate-indicator');
@@ -986,39 +979,40 @@ function init3DCADViewport() {
   if (btnAutorotate) {
     btnAutorotate.addEventListener('click', () => {
       autoRotate = !autoRotate;
-      btnAutorotate.classList.toggle('active', autoRotate);
-      btnAutorotate.setAttribute('aria-pressed', String(autoRotate));
-      if (autorotateIndicator) autorotateIndicator.textContent = autoRotate ? '●' : '○';
+      syncAutorotateUi();
+      resumeRendering();
     });
   }
 
-  // Reset Camera View Button
+  // Smoothed orbit: pointer input moves the *target*, the render loop eases toward it
+  const target = { rotX: CAD_HOME.rotX, rotY: CAD_HOME.rotY, camZ: CAD_HOME.camZ };
+
   const btnReset = document.getElementById('cad-btn-reset');
   if (btnReset) {
     btnReset.addEventListener('click', () => {
-      assemblyGroup.rotation.x = 0.28;
-      assemblyGroup.rotation.y = -0.42;
-      camera.position.set(0, 0.6, 6.4);
+      target.rotX = CAD_HOME.rotX;
+      // take the short way round to the home angle
+      const turns = Math.round((assembly.rotation.y - CAD_HOME.rotY) / (Math.PI * 2));
+      target.rotY = CAD_HOME.rotY + turns * Math.PI * 2;
+      target.camZ = CAD_HOME.camZ;
       if (explodeSlider) {
         explodeSlider.value = 0;
         updateExplodedAssembly(0);
         if (explodeValDisplay) explodeValDisplay.textContent = '0%';
       }
+      resumeRendering();
     });
   }
 
-  // ------------------------------------------------------------------------
-  // MOUSE & TOUCH ORBIT INTERACTION
-  // ------------------------------------------------------------------------
   let isDragging = false;
   let prevPointerX = 0;
   let prevPointerY = 0;
   const coordsElem = document.getElementById('cad-coords');
 
   function updateCoordsReadout() {
-    if (!coordsElem) return;
-    const degX = Math.round(assemblyGroup.rotation.x * (180 / Math.PI));
-    const degY = Math.round(assemblyGroup.rotation.y * (180 / Math.PI)) % 360;
+    if (!coordsElem || !modelReady) return;
+    const degX = Math.round(assembly.rotation.x * (180 / Math.PI));
+    const degY = ((Math.round(assembly.rotation.y * (180 / Math.PI)) % 360) + 360) % 360;
     coordsElem.textContent = `ROT: ${degX}° // ${degY}°`;
   }
 
@@ -1027,19 +1021,16 @@ function init3DCADViewport() {
     prevPointerX = e.clientX;
     prevPointerY = e.clientY;
     container.style.cursor = 'grabbing';
+    resumeRendering();
   });
 
   window.addEventListener('pointermove', (e) => {
     if (!isDragging) return;
-    const dx = e.clientX - prevPointerX;
-    const dy = e.clientY - prevPointerY;
+    target.rotY += (e.clientX - prevPointerX) * 0.008;
+    target.rotX += (e.clientY - prevPointerY) * 0.008;
+    target.rotX = Math.max(-0.7, Math.min(0.9, target.rotX));
     prevPointerX = e.clientX;
     prevPointerY = e.clientY;
-
-    assemblyGroup.rotation.y += dx * 0.008;
-    assemblyGroup.rotation.x += dy * 0.008;
-    assemblyGroup.rotation.x = Math.max(-0.9, Math.min(0.9, assemblyGroup.rotation.x));
-    updateCoordsReadout();
   });
 
   function endDrag() {
@@ -1049,15 +1040,29 @@ function init3DCADViewport() {
   window.addEventListener('pointerup', endDrag);
   window.addEventListener('pointercancel', endDrag);
 
-  // Wheel Zoom (Ctrl / Cmd + scroll only, so normal page scrolling is never trapped)
+  // Zoom with Ctrl / Cmd + scroll so normal page scrolling is never trapped
   container.addEventListener('wheel', (e) => {
     if (!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
-    camera.position.z += e.deltaY * 0.004;
-    camera.position.z = Math.max(4.2, Math.min(8.8, camera.position.z));
+    target.camZ = Math.max(5.2, Math.min(12, target.camZ + e.deltaY * 0.01));
+    resumeRendering();
   }, { passive: false });
 
-  // Responsive Resize
+  // Keyboard orbit / zoom for accessibility
+  container.setAttribute('tabindex', '0');
+  container.addEventListener('keydown', (e) => {
+    const step = 0.12;
+    if (e.key === 'ArrowLeft') target.rotY -= step;
+    else if (e.key === 'ArrowRight') target.rotY += step;
+    else if (e.key === 'ArrowUp') target.rotX = Math.max(-0.7, target.rotX - step);
+    else if (e.key === 'ArrowDown') target.rotX = Math.min(0.9, target.rotX + step);
+    else if (e.key === '+' || e.key === '=') target.camZ = Math.max(5.2, target.camZ - 0.5);
+    else if (e.key === '-') target.camZ = Math.min(12, target.camZ + 0.5);
+    else return;
+    e.preventDefault();
+    resumeRendering();
+  });
+
   window.addEventListener('resize', () => {
     const newW = container.clientWidth;
     const newH = container.clientHeight;
@@ -1065,32 +1070,41 @@ function init3DCADViewport() {
     camera.aspect = newW / newH;
     camera.updateProjectionMatrix();
     renderer.setSize(newW, newH);
+    resumeRendering();
   });
 
-  // Listen for Dark/Light mode change to sync wireframe color
+  // Keep wireframe colours in step with the light / dark theme
   const themeObserver = new MutationObserver(() => {
-    if (currentMode === 'wire') setRenderMode('wire');
+    if (modelReady) setRenderMode(currentMode);
+    resumeRendering();
   });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
   // ------------------------------------------------------------------------
-  // ANIMATION LOOP
+  // RENDER LOOP (only while visible; idles once everything has settled)
   // ------------------------------------------------------------------------
-  // Only render while the viewport is on screen and the tab is visible
   let inView = true;
   let frameId = 0;
 
   function animate() {
     frameId = 0;
-    if (!inView || document.hidden) return;
-    frameId = requestAnimationFrame(animate);
+    if (!modelReady || !inView || document.hidden) return;
 
-    if (autoRotate && !isDragging) {
-      assemblyGroup.rotation.y += 0.006;
-      updateCoordsReadout();
-    }
+    if (autoRotate && !isDragging) target.rotY += 0.0055;
 
+    const ease = prefersReducedMotion.matches ? 1 : 0.12;
+    assembly.rotation.x += (target.rotX - assembly.rotation.x) * ease;
+    assembly.rotation.y += (target.rotY - assembly.rotation.y) * ease;
+    camera.position.z += (target.camZ - camera.position.z) * ease;
+    camera.lookAt(0, 0, 0);
+
+    updateCoordsReadout();
     renderer.render(scene, camera);
+
+    const settled = Math.abs(target.rotX - assembly.rotation.x) < 1e-4 &&
+      Math.abs(target.rotY - assembly.rotation.y) < 1e-4 &&
+      Math.abs(target.camZ - camera.position.z) < 1e-3;
+    if (autoRotate || isDragging || !settled) frameId = requestAnimationFrame(animate);
   }
 
   function resumeRendering() {
@@ -1105,7 +1119,6 @@ function init3DCADViewport() {
   }
   document.addEventListener('visibilitychange', resumeRendering);
 
-  updateCoordsReadout();
   resumeRendering();
 }
 

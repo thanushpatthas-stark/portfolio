@@ -3106,3 +3106,22 @@ button {
     flex-shrink: 0;
   }
 }
+
+/* 3D CAD viewport: loading state + keyboard focus */
+.cad-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.cad-canvas-wrapper:focus-visible {
+  outline-offset: -3px;
+}

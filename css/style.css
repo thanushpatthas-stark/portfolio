@@ -1,7 +1,6 @@
 /* ==========================================================================
    THANUSH PUVANESVARAN — INDUSTRIAL & PRODUCT DESIGN PORTFOLIO
    Design System: Swiss Technical & Minimalist Editorial
-   Inspired by Dominik Scherrer's Behance Industrial Design Portfolio (2023)
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -1398,7 +1397,7 @@ button {
   font-weight: 600;
 }
 
-/* Projects Grid - Dominik Scherrer Editorial Asymmetry */
+/* Projects Grid - Editorial Asymmetry */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -2008,7 +2007,7 @@ button {
 
 /* --------------------------------------------------------------------------
    12. ABOUT & PROFILE SECTION (PROMINENT REAL PICTURES)
-   Features BOTH `thanush_proffesional.png` & `formal_me.jpg`
+   Features both the studio and formal portraits
    -------------------------------------------------------------------------- */
 .about-dual-showcase {
   display: grid;
@@ -2933,5 +2932,177 @@ button {
 
   .portrait-toggle-bar {
     grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   16. ACCESSIBILITY, MOTION & ROBUSTNESS FIXES
+   -------------------------------------------------------------------------- */
+
+/* Gallery column spans used by the Smart Bento / Flute Mist case studies */
+.gallery-item.col-7 { grid-column: span 7; }
+.gallery-item.col-5 { grid-column: span 5; }
+
+@media (max-width: 540px) {
+  .gallery-item[class*="col-"] { grid-column: span 12; }
+}
+
+/* Skip link */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 10px 16px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--transition-fast);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Visible keyboard focus */
+:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 3px;
+}
+
+.project-card:focus-visible,
+.gallery-item:focus-visible {
+  outline-offset: -2px;
+}
+
+.project-card {
+  cursor: pointer;
+}
+
+.project-card:focus-visible .project-action-btn {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+/* Hidden dialogs must not be reachable by keyboard / assistive tech.
+   Visibility flips instantly on open (so focus can move in at once) and fades out on close. */
+.case-study-overlay:not(.active),
+.lightbox-modal:not(.active) {
+  visibility: hidden;
+}
+
+.case-study-overlay.active,
+.lightbox-modal.active {
+  visibility: visible;
+  transition-property: opacity;
+}
+
+/* `transition: all` on controls would otherwise animate the inherited visibility change */
+.case-study-overlay.active :is(button, a),
+.lightbox-modal.active :is(button, a) {
+  transition-property: color, background-color, border-color, opacity, transform, box-shadow;
+}
+
+/* CAD viewport: let vertical swipes scroll the page, horizontal drags orbit */
+.cad-canvas-wrapper {
+  touch-action: pan-y;
+}
+
+.cad-fallback-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Former inline styles */
+.academic-specialization {
+  margin-top: 8px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
+
+.about-actions-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.about-cta-link {
+  padding: 10px 22px;
+}
+
+.contact-index-badge {
+  margin-bottom: 16px;
+}
+
+.case-gallery-heading {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.cad-fallback-note {
+  padding: 24px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
+  }
+
+  .ambient-cursor-spotlight {
+    display: none;
+  }
+}
+
+/* Header: keep labels on one line and make the phone header fit (hamburger was pushed off-screen) */
+.dock-label {
+  white-space: nowrap;
+}
+
+.brand-text-block {
+  min-width: 0;
+}
+
+@media (max-width: 540px) {
+  .brand-id-chip,
+  .theme-label {
+    display: none;
+  }
+
+  .brand-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-dock-actions {
+    gap: 8px;
+    flex-shrink: 0;
   }
 }

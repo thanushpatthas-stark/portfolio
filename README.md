@@ -1,6 +1,6 @@
 # Thanush Puvanesvaran — Industrial & Product Design Portfolio
 
-![Portfolio Preview Banner](Img/thanush_proffesional.png)
+![Portfolio Preview Banner](Img/portrait-studio.webp)
 
 > Official Industrial & Product Design Portfolio of Thanush Puvanesvaran, undergraduate designer at the Faculty of Innovative Design & Technology (FRIT), Universiti Sultan Zainal Abidin (UniSZA).
 
@@ -13,7 +13,7 @@ This portfolio showcases physical objects, parametric 3D CAD assemblies, worksho
 - **Smart Bento** — modular systems and prototyping
 - **Flute Mist** — personal appliance concept and CMF
 
-The website includes an interactive Three.js CAD viewport, project case-study drawer, lightbox gallery, responsive navigation, and white/dark theme modes.
+The website includes an interactive Three.js CAD viewport, project case-study drawer, lightbox gallery, responsive navigation, and white/dark theme modes. Images are optimised WebP, motion respects `prefers-reduced-motion`, and the case-study dialogs are keyboard accessible.
 
 ## Technology
 

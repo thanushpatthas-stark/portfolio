@@ -1,8 +1,59 @@
 /**
  * THANUSH PUVANESVARAN — INDUSTRIAL & PRODUCT DESIGN PORTFOLIO
  * Main Interactive Engine: Filtering, Case Studies, Lightbox, Time, Theme & Copy
- * Inspired by Dominik Scherrer's Behance Portfolio 2023
  */
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
+function readStored(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+
+function writeStored(key, value) {
+  try { localStorage.setItem(key, value); } catch (e) { /* storage unavailable */ }
+}
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** Keep Tab / Shift+Tab inside a dialog while it is open. */
+function trapTab(e, container) {
+  if (e.key !== 'Tab') return;
+  const items = Array.from(container.querySelectorAll(FOCUSABLE)).filter(el => el.offsetParent !== null);
+  if (!items.length) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (e.shiftKey && (document.activeElement === first || !container.contains(document.activeElement))) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && (document.activeElement === last || !container.contains(document.activeElement))) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+/** Focus an element inside a dialog that may still be transitioning from visibility:hidden. */
+function focusWhenReady(el) {
+  if (!el) return;
+  el.focus();
+  if (document.activeElement !== el) {
+    requestAnimationFrame(() => {
+      el.focus();
+      if (document.activeElement !== el) setTimeout(() => el.focus(), 80);
+    });
+  }
+}
+
+/** Lock page scroll while any dialog is open. */
+function syncScrollLock() {
+  const open = document.querySelector('#case-study-overlay.active, #lightbox-modal.active');
+  document.body.style.overflow = open ? 'hidden' : '';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   initThemeToggle();
@@ -26,8 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function initThemeToggle() {
   const lightBtn = document.getElementById('theme-btn-light');
   const darkBtn = document.getElementById('theme-btn-dark');
-  const savedTheme = localStorage.getItem('id_portfolio_theme') || 'light';
-  
+  const stored = readStored('id_portfolio_theme');
+  const savedTheme = stored === 'dark' || stored === 'light' ? stored : 'light';
+
   applyTheme(savedTheme);
 
   if (lightBtn) {
@@ -39,16 +91,14 @@ function initThemeToggle() {
 
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('id_portfolio_theme', theme);
+    writeStored('id_portfolio_theme', theme);
 
     if (lightBtn && darkBtn) {
-      if (theme === 'dark') {
-        darkBtn.classList.add('active');
-        lightBtn.classList.remove('active');
-      } else {
-        lightBtn.classList.add('active');
-        darkBtn.classList.remove('active');
-      }
+      const isDark = theme === 'dark';
+      darkBtn.classList.toggle('active', isDark);
+      lightBtn.classList.toggle('active', !isDark);
+      darkBtn.setAttribute('aria-checked', String(isDark));
+      lightBtn.setAttribute('aria-checked', String(!isDark));
     }
   }
 }
@@ -104,28 +154,37 @@ function initScrollReveal() {
    04. PROJECT CATEGORY FILTERING
    -------------------------------------------------------------------------- */
 function initCategoryFilters() {
-  const filterBtns = document.querySelectorAll('.filter-btn');
+  // Only real filter buttons; other .filter-btn-styled links must not trigger filtering
+  const filterBtns = document.querySelectorAll('.filter-btn[data-filter]');
   const projectItems = document.querySelectorAll('.project-item');
+
+  const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+  if (allBtn) allBtn.textContent = `All Projects (${projectItems.length})`;
 
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
+      filterBtns.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
 
       const filter = btn.getAttribute('data-filter');
 
       projectItems.forEach(item => {
+        clearTimeout(item._filterTimer);
         const category = item.getAttribute('data-category');
         if (filter === 'all' || category === filter) {
           item.style.display = 'flex';
-          setTimeout(() => {
+          item._filterTimer = setTimeout(() => {
             item.style.opacity = '1';
             item.style.transform = 'translateY(0)';
           }, 50);
         } else {
           item.style.opacity = '0';
           item.style.transform = 'translateY(12px)';
-          setTimeout(() => {
+          item._filterTimer = setTimeout(() => {
             item.style.display = 'none';
           }, 200);
         }
@@ -170,27 +229,27 @@ const caseStudies = {
     ],
     gallery: [
       {
-        src: 'Img/Black and White Minimalist Designer Portfolio Presentation (1).png',
+        src: 'Img/boat-redang-hero.webp',
         col: 'col-12',
         caption: 'Boat Redang Trio — Handcrafted hull profiles with custom dyed sails and rigging'
       },
       {
-        src: 'Img/Black and White Minimalist Designer Portfolio Presentation (2).png',
+        src: 'Img/design-development-board.webp',
         col: 'col-6',
         caption: 'Design Development Board — Nautical inspiration, form exploration & material selections'
       },
       {
-        src: 'Img/Black and White Minimalist Designer Portfolio Presentation (4).png',
+        src: 'Img/boat-redang-process.webp',
         col: 'col-6',
         caption: 'Craft Process & Technical Breakdown — Rigging assemblies, timber carving & jointing'
       },
       {
-        src: 'Img/Black and White Minimalist Designer Portfolio Presentation (7).png',
+        src: 'Img/boat-redang-detail.webp',
         col: 'col-6',
         caption: 'Detailed Silhouette — Single Boat Redang miniature showcasing brass grommets and deck'
       },
       {
-        src: 'Img/Suloam Addy Poster-1.png',
+        src: 'Img/boat-redang-exhibition-poster.webp',
         col: 'col-6',
         caption: 'Final Design Exhibition Poster — Complete visual story and cultural documentation'
       }
@@ -229,17 +288,17 @@ const caseStudies = {
     ],
     gallery: [
       {
-        src: 'Img/Black and White Minimalist Designer Portfolio Presentation (3).png',
+        src: 'Img/agomoto-technical-poster.webp',
         col: 'col-12',
         caption: 'Agomoto Technical Poster — Exploded CAD view, component breakdown & driver chamber'
       },
       {
-        src: 'Img/Black and White Minimalist Designer Portfolio Presentation (5).png',
+        src: 'Img/agomoto-hero-render.webp',
         col: 'col-6',
         caption: 'Studio Hero Render — Dual-tone metallic finish under directional studio lighting'
       },
       {
-        src: 'Img/Black and White Minimalist Designer Portfolio Presentation (2).png',
+        src: 'Img/design-development-board.webp',
         col: 'col-6',
         caption: 'Concept Development Board — Form language studies and acoustic volume calculations'
       }
@@ -278,12 +337,12 @@ const caseStudies = {
     ],
     gallery: [
       {
-        src: 'Img/Black and White Minimalist Designer Portfolio Presentation (6).png',
+        src: 'Img/smart-bento-prototype.webp',
         col: 'col-7',
         caption: 'Physical Working Prototype — Open and closed tiered modular configuration'
       },
       {
-        src: 'Img/Untitled design (2).png',
+        src: 'Img/smart-bento-ergonomics-board.webp',
         col: 'col-5',
         caption: 'Design & Ergonomics Board — User flow, compartment breakdown & latch mechanics'
       }
@@ -322,12 +381,12 @@ const caseStudies = {
     ],
     gallery: [
       {
-        src: 'Img/humidifier.png',
+        src: 'Img/flute-mist-concept-board.webp',
         col: 'col-7',
         caption: 'Flute Humidifier Concept Board — Main perspective, feature callouts & mist stream'
       },
       {
-        src: 'Img/Untitled design (3).png',
+        src: 'Img/flute-mist-form-studies.webp',
         col: 'col-5',
         caption: 'Form & CMF Studies — Geometry derivations, handle ergonomics & vent alignments'
       }
@@ -340,6 +399,7 @@ function initCaseStudyDrawer() {
   const drawerBody = document.getElementById('drawer-body');
   const closeBtn = document.getElementById('drawer-close-btn');
   const triggers = document.querySelectorAll('[data-open-case]');
+  let lastFocus = null;
 
   if (!overlay || !drawerBody) return;
 
@@ -347,38 +407,38 @@ function initCaseStudyDrawer() {
     const data = caseStudies[id];
     if (!data) return;
 
-    let specsHtml = data.specs.map(s => `
+    const specsHtml = data.specs.map(s => `
       <div class="case-spec-item">
-        <div class="case-spec-label">${s.label}</div>
-        <div class="case-spec-val">${s.val}</div>
+        <div class="case-spec-label">${escapeHtml(s.label)}</div>
+        <div class="case-spec-val">${escapeHtml(s.val)}</div>
       </div>
     `).join('');
 
-    let stagesHtml = data.stages.map(st => `
+    const stagesHtml = data.stages.map(st => `
       <div class="case-stage">
         <div class="case-stage-marker">
-          <span class="case-stage-num">${st.num}</span>
-          <span class="case-stage-label">${st.label}</span>
+          <span class="case-stage-num">${escapeHtml(st.num)}</span>
+          <span class="case-stage-label">${escapeHtml(st.label)}</span>
         </div>
         <div class="case-stage-content">
-          <h4>${st.title}</h4>
-          <p>${st.desc}</p>
+          <h4>${escapeHtml(st.title)}</h4>
+          <p>${escapeHtml(st.desc)}</p>
         </div>
       </div>
     `).join('');
 
-    let galleryHtml = data.gallery.map(g => `
-      <div class="gallery-item ${g.col}" data-lightbox-src="${g.src}" data-lightbox-caption="${g.caption}">
-        <img src="${g.src}" alt="${g.caption}" loading="lazy">
-        <div class="gallery-caption-overlay">${g.caption}</div>
+    const galleryHtml = data.gallery.map(g => `
+      <div class="gallery-item ${escapeHtml(g.col)}" role="button" tabindex="0" aria-label="Enlarge image: ${escapeHtml(g.caption)}" data-lightbox-src="${escapeHtml(g.src)}" data-lightbox-caption="${escapeHtml(g.caption)}">
+        <img src="${escapeHtml(g.src)}" alt="${escapeHtml(g.caption)}" loading="lazy" decoding="async">
+        <div class="gallery-caption-overlay">${escapeHtml(g.caption)}</div>
       </div>
     `).join('');
 
     drawerBody.innerHTML = `
       <div class="case-meta-header">
-        <div class="case-eyebrow">${data.index}</div>
-        <h2 class="case-hero-title">${data.title}</h2>
-        <p class="case-lead-text">${data.lead}</p>
+        <div class="case-eyebrow">${escapeHtml(data.index)}</div>
+        <h2 class="case-hero-title">${escapeHtml(data.title)}</h2>
+        <p class="case-lead-text">${escapeHtml(data.lead)}</p>
       </div>
 
       <div class="case-specs-table">
@@ -390,30 +450,42 @@ function initCaseStudyDrawer() {
       </div>
 
       <div class="case-gallery-section">
-        <div class="case-gallery-heading" style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 14px;">Design & CAD Gallery · Click to enlarge</div>
+        <div class="case-gallery-heading">Design &amp; CAD Gallery · Click to enlarge</div>
         <div class="case-gallery-grid">
           ${galleryHtml}
         </div>
       </div>
     `;
 
+    lastFocus = document.activeElement;
     overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    overlay.setAttribute('aria-hidden', 'false');
+    overlay.querySelector('.case-study-drawer').scrollTop = 0;
+    syncScrollLock();
+    focusWhenReady(closeBtn);
 
-    // Re-bind lightbox click events for dynamically generated gallery items
     initDynamicGalleryClicks();
   }
 
   function closeCase() {
     overlay.classList.remove('active');
-    document.body.style.overflow = '';
+    overlay.setAttribute('aria-hidden', 'true');
+    syncScrollLock();
+    if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+    lastFocus = null;
   }
 
   triggers.forEach(trig => {
+    const open = () => openCase(trig.getAttribute('data-open-case'));
     trig.addEventListener('click', (e) => {
       e.preventDefault();
-      const id = trig.getAttribute('data-open-case');
-      openCase(id);
+      open();
+    });
+    trig.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open();
+      }
     });
   });
 
@@ -424,9 +496,10 @@ function initCaseStudyDrawer() {
   });
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlay.classList.contains('active')) {
-      closeCase();
-    }
+    if (!overlay.classList.contains('active')) return;
+    if (document.getElementById('lightbox-modal').classList.contains('active')) return;
+    if (e.key === 'Escape') closeCase();
+    trapTab(e, overlay);
   });
 }
 
@@ -435,6 +508,8 @@ function initCaseStudyDrawer() {
    -------------------------------------------------------------------------- */
 let activeLightboxIndex = 0;
 let currentLightboxItems = [];
+let lightboxOpener = null;
+let openLightboxAt = () => {};
 
 function initLightbox() {
   const modal = document.getElementById('lightbox-modal');
@@ -445,6 +520,7 @@ function initLightbox() {
   if (!modal) return;
 
   function showImage(index) {
+    if (!currentLightboxItems.length) return;
     if (index < 0) index = currentLightboxItems.length - 1;
     if (index >= currentLightboxItems.length) index = 0;
     activeLightboxIndex = index;
@@ -462,9 +538,24 @@ function initLightbox() {
     }
   }
 
+  function openLightbox(index, opener) {
+    lightboxOpener = opener || null;
+    showImage(index);
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    syncScrollLock();
+    focusWhenReady(closeBtn);
+  }
+
   function closeLightbox() {
     modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    syncScrollLock();
+    if (lightboxOpener && typeof lightboxOpener.focus === 'function') lightboxOpener.focus();
+    lightboxOpener = null;
   }
+
+  openLightboxAt = openLightbox;
 
   if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
   if (prevBtn) prevBtn.addEventListener('click', () => showImage(activeLightboxIndex - 1));
@@ -481,13 +572,13 @@ function initLightbox() {
     if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowLeft') showImage(activeLightboxIndex - 1);
     if (e.key === 'ArrowRight') showImage(activeLightboxIndex + 1);
+    trapTab(e, modal);
   });
 }
 
 function initDynamicGalleryClicks() {
   const galleryItems = document.querySelectorAll('[data-lightbox-src]');
-  const modal = document.getElementById('lightbox-modal');
-  if (!galleryItems.length || !modal) return;
+  if (!galleryItems.length) return;
 
   currentLightboxItems = Array.from(galleryItems).map(item => ({
     src: item.getAttribute('data-lightbox-src'),
@@ -495,13 +586,12 @@ function initDynamicGalleryClicks() {
   }));
 
   galleryItems.forEach((item, idx) => {
-    item.addEventListener('click', () => {
-      activeLightboxIndex = idx;
-      const img = document.getElementById('lightbox-img');
-      const cap = document.getElementById('lightbox-caption');
-      img.src = currentLightboxItems[idx].src;
-      cap.textContent = currentLightboxItems[idx].caption || '';
-      modal.classList.add('active');
+    item.addEventListener('click', () => openLightboxAt(idx, item));
+    item.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLightboxAt(idx, item);
+      }
     });
   });
 }
@@ -512,29 +602,52 @@ function initDynamicGalleryClicks() {
 function initEmailCopy() {
   const copyBtns = document.querySelectorAll('[data-copy-email]');
   const toast = document.getElementById('toast-msg');
+  let toastTimer = null;
 
-  copyBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const email = btn.getAttribute('data-copy-email') || 'thanushpatthas@gmail.com';
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (err) { /* fall through to legacy copy */ }
 
-      navigator.clipboard.writeText(email).then(() => {
-        showToast(`Email copied: ${email}`);
-      }).catch(() => {
-        // Fallback
-        window.location.href = `mailto:${email}`;
-      });
-    });
-  });
+    try {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      area.remove();
+      return ok;
+    } catch (err) {
+      return false;
+    }
+  }
 
   function showToast(message) {
     if (!toast) return;
     toast.textContent = message;
     toast.classList.add('show');
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 3000);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
   }
+
+  copyBtns.forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = btn.getAttribute('data-copy-email') || 'thanushpatthas@gmail.com';
+
+      if (await copyText(email)) {
+        showToast(`Email copied: ${email}`);
+      } else {
+        window.location.href = `mailto:${email}`;
+      }
+    });
+  });
 }
 
 /* --------------------------------------------------------------------------
@@ -548,42 +661,59 @@ function initHeroPortraitSwitcher() {
 
   if (!portraitImg || !btnStudio || !btnFormal) return;
 
-  function switchPhoto(btn, targetBtn, src, badgeText) {
+  const buttons = [btnStudio, btnFormal];
+  let swapTimer = null;
+
+  buttons.forEach(btn => {
     btn.addEventListener('click', () => {
-      btn.classList.add('active');
-      targetBtn.classList.remove('active');
+      if (btn.classList.contains('active')) return;
+      buttons.forEach(b => {
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
 
       portraitImg.style.opacity = '0';
       portraitImg.style.transform = 'scale(0.96)';
 
-      setTimeout(() => {
-        portraitImg.src = src;
-        if (badge) badge.textContent = badgeText;
+      clearTimeout(swapTimer);
+      swapTimer = setTimeout(() => {
+        portraitImg.src = btn.dataset.photoSrc;
+        portraitImg.alt = btn.dataset.alt || portraitImg.alt;
+        if (badge) badge.textContent = btn.dataset.badge;
         portraitImg.style.opacity = '1';
         portraitImg.style.transform = 'scale(1)';
-      }, 200);
+      }, prefersReducedMotion.matches ? 0 : 200);
     });
-  }
-
-  switchPhoto(btnStudio, btnFormal, 'Img/thanush_proffesional.png', 'STUDIO WORK MODE');
-  switchPhoto(btnFormal, btnStudio, 'Img/formal_me.jpg', 'FORMAL PROFILE');
+  });
 }
 
 /* --------------------------------------------------------------------------
    09. INTERACTIVE 3D CAD MODELING VIEWPORT (THREE.JS ENGINE)
    Showcases Agomoto Acoustic Speaker Assembly with Wireframe/CMF/Clay & Explode
    -------------------------------------------------------------------------- */
+function showCadFallback(container, message) {
+  container.innerHTML = '';
+  const img = document.createElement('img');
+  img.className = 'cad-fallback-img';
+  img.src = 'Img/agomoto-hero-render.webp';
+  img.alt = 'Render of the Agomoto acoustic speaker';
+  container.appendChild(img);
+  container.title = message;
+  container.style.cursor = 'default';
+  const toolbar = document.querySelector('.cad-viewport-toolbar');
+  if (toolbar) toolbar.hidden = true;
+  const coords = document.getElementById('cad-coords');
+  if (coords) coords.textContent = message;
+}
+
 function init3DCADViewport() {
   const container = document.getElementById('cad-canvas-container');
   if (!container) return;
 
   // Verify Three.js availability
   if (typeof THREE === 'undefined') {
-    container.innerHTML = `
-      <div style="padding: 24px; text-align: center; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">
-        [ THREE.JS 3D ENGINE LOADING... ]
-      </div>
-    `;
+    showCadFallback(container, '3D engine unavailable. Showing a static render instead.');
     return;
   }
 
@@ -597,7 +727,13 @@ function init3DCADViewport() {
   camera.position.set(0, 0.6, 6.4);
 
   // WebGL Renderer
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  } catch (err) {
+    showCadFallback(container, 'WebGL is unavailable on this device. Showing a static render instead.');
+    return;
+  }
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputEncoding = THREE.sRGBEncoding;
@@ -811,8 +947,12 @@ function init3DCADViewport() {
   const modeBtns = document.querySelectorAll('[data-cad-mode]');
   modeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      modeBtns.forEach(b => b.classList.remove('active'));
+      modeBtns.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
       setRenderMode(btn.getAttribute('data-cad-mode'));
     });
   });
@@ -831,14 +971,23 @@ function init3DCADViewport() {
   }
 
   // Turntable Auto-Rotate Button
-  let autoRotate = true;
+  let autoRotate = !prefersReducedMotion.matches;
   const btnAutorotate = document.getElementById('cad-btn-autorotate');
   const autorotateIndicator = document.getElementById('autorotate-indicator');
+
+  function syncAutorotateUi() {
+    if (!btnAutorotate) return;
+    btnAutorotate.classList.toggle('active', autoRotate);
+    btnAutorotate.setAttribute('aria-pressed', String(autoRotate));
+    if (autorotateIndicator) autorotateIndicator.textContent = autoRotate ? '●' : '○';
+  }
+  syncAutorotateUi();
 
   if (btnAutorotate) {
     btnAutorotate.addEventListener('click', () => {
       autoRotate = !autoRotate;
       btnAutorotate.classList.toggle('active', autoRotate);
+      btnAutorotate.setAttribute('aria-pressed', String(autoRotate));
       if (autorotateIndicator) autorotateIndicator.textContent = autoRotate ? '●' : '○';
     });
   }
@@ -893,13 +1042,16 @@ function init3DCADViewport() {
     updateCoordsReadout();
   });
 
-  window.addEventListener('pointerup', () => {
+  function endDrag() {
     isDragging = false;
     container.style.cursor = 'grab';
-  });
+  }
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
 
-  // Wheel Zoom
+  // Wheel Zoom (Ctrl / Cmd + scroll only, so normal page scrolling is never trapped)
   container.addEventListener('wheel', (e) => {
+    if (!e.ctrlKey && !e.metaKey) return;
     e.preventDefault();
     camera.position.z += e.deltaY * 0.004;
     camera.position.z = Math.max(4.2, Math.min(8.8, camera.position.z));
@@ -924,8 +1076,14 @@ function init3DCADViewport() {
   // ------------------------------------------------------------------------
   // ANIMATION LOOP
   // ------------------------------------------------------------------------
+  // Only render while the viewport is on screen and the tab is visible
+  let inView = true;
+  let frameId = 0;
+
   function animate() {
-    requestAnimationFrame(animate);
+    frameId = 0;
+    if (!inView || document.hidden) return;
+    frameId = requestAnimationFrame(animate);
 
     if (autoRotate && !isDragging) {
       assemblyGroup.rotation.y += 0.006;
@@ -935,8 +1093,20 @@ function init3DCADViewport() {
     renderer.render(scene, camera);
   }
 
-  animate();
+  function resumeRendering() {
+    if (!frameId && inView && !document.hidden) frameId = requestAnimationFrame(animate);
+  }
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      inView = entries[0].isIntersecting;
+      resumeRendering();
+    }).observe(container);
+  }
+  document.addEventListener('visibilitychange', resumeRendering);
+
   updateCoordsReadout();
+  resumeRendering();
 }
 
 /* --------------------------------------------------------------------------
@@ -950,6 +1120,7 @@ function initAmbientWaveCanvas() {
   let width = 0;
   let height = 0;
   let time = 0;
+  let frameId = 0;
 
   let mouse = {
     x: -1000,
@@ -971,7 +1142,7 @@ function initAmbientWaveCanvas() {
     mouse.targetY = e.clientY;
   }, { passive: true });
 
-  window.addEventListener('mouseleave', () => {
+  document.documentElement.addEventListener('mouseleave', () => {
     mouse.targetX = -1000;
     mouse.targetY = -1000;
   });
@@ -1054,10 +1225,15 @@ function initAmbientWaveCanvas() {
       ctx.fill();
     });
 
-    requestAnimationFrame(draw);
+    frameId = 0;
+    // Static single frame for reduced motion; pause while the tab is hidden
+    if (!document.hidden && !prefersReducedMotion.matches) frameId = requestAnimationFrame(draw);
   }
 
-  requestAnimationFrame(draw);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !frameId) frameId = requestAnimationFrame(draw);
+  });
+  frameId = requestAnimationFrame(draw);
 }
 
 /* --------------------------------------------------------------------------
@@ -1065,13 +1241,25 @@ function initAmbientWaveCanvas() {
    -------------------------------------------------------------------------- */
 function initCursorSpotlight() {
   const spotlight = document.getElementById('cursor-spotlight');
-  if (!spotlight) return;
+  if (!spotlight || prefersReducedMotion.matches) return;
 
   let mouseX = window.innerWidth / 2;
   let mouseY = window.innerHeight / 2;
   let currentX = mouseX;
   let currentY = mouseY;
   let fadeTimeout = null;
+  let frameId = 0;
+
+  function renderSpotlight() {
+    currentX += (mouseX - currentX) * 0.08;
+    currentY += (mouseY - currentY) * 0.08;
+
+    spotlight.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+
+    // Stop the loop once the spotlight has caught up with the cursor
+    const settled = Math.abs(mouseX - currentX) < 0.5 && Math.abs(mouseY - currentY) < 0.5;
+    frameId = settled ? 0 : requestAnimationFrame(renderSpotlight);
+  }
 
   window.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
@@ -1083,19 +1271,13 @@ function initCursorSpotlight() {
       // Softly reduce intensity when cursor is stationary
       spotlight.style.opacity = '0.7';
     }, 1800);
+
+    if (!frameId) frameId = requestAnimationFrame(renderSpotlight);
   }, { passive: true });
 
-  window.addEventListener('mouseleave', () => {
+  document.documentElement.addEventListener('mouseleave', () => {
     spotlight.style.opacity = '0';
   });
-
-  function renderSpotlight() {
-    currentX += (mouseX - currentX) * 0.08;
-    currentY += (mouseY - currentY) * 0.08;
-
-    spotlight.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-    requestAnimationFrame(renderSpotlight);
-  }
 
   renderSpotlight();
 }
@@ -1146,10 +1328,12 @@ function initMobileNavDrawer() {
   }
 
   function closeDrawer() {
+    const hadFocus = drawer.contains(document.activeElement);
     drawer.classList.remove('active');
     toggleBtn.classList.remove('is-open');
     toggleBtn.setAttribute('aria-expanded', 'false');
     drawer.setAttribute('aria-hidden', 'true');
+    if (hadFocus) toggleBtn.focus();
   }
 
   toggleBtn.addEventListener('click', toggleDrawer);
@@ -1172,6 +1356,3 @@ function initMobileNavDrawer() {
     }
   });
 }
-
-
-

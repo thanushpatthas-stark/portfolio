@@ -3125,3 +3125,16 @@ button {
 .cad-canvas-wrapper:focus-visible {
   outline-offset: -3px;
 }
+
+/* Project cards whose artwork must not be cropped (full poster / full product shown) */
+.project-media-wrap.media-fit img {
+  object-fit: contain;
+}
+
+.project-media-wrap.media-fit-agomoto {
+  background: #dadcde;
+}
+
+.project-media-wrap.media-fit-flute {
+  background: #ffffff;
+}

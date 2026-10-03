@@ -24,13 +24,15 @@ The website includes an interactive Three.js CAD viewport that loads the real Ag
 
 ## Run locally
 
-Serve the project locally (the 3D model is loaded with `fetch`, so opening `index.html` straight from disk shows a static render instead of the live model):
+Requires [Node.js](https://nodejs.org) 16 or newer. There is nothing to install:
 
 ```bash
-python -m http.server 8080
+npm start
 ```
 
-Then visit `http://localhost:8080`. On GitHub Pages everything works as-is; all asset paths are relative and lower-case.
+Then open `http://localhost:3000`. To use another port: `PORT=8080 npm start` (PowerShell: `$env:PORT=8080; npm start`).
+
+The 3D model is loaded with `fetch`, so use the server above rather than double-clicking `index.html` (opened straight from disk, the page shows a static render instead of the live model). On GitHub Pages everything works as-is; all asset paths are relative and lower-case.
 
 ## Contact & Industry Inquiries
 
